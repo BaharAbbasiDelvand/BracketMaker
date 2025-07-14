@@ -1,6 +1,5 @@
-import React from "react";
 import "./App.css";
-import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import RoundRobin from "./components/round-robin/RoundRobin";
 import SingleElimination from "./components/single-elimination/SingleElimination";
 import { Home } from "./components/home/Home";

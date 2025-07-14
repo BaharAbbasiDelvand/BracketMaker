@@ -28,11 +28,35 @@ const RoundRobin = () => {
     };
 
     const handleVote = (matchupId: number, winner: string) => {
-        setMatchups((prev) =>
-            prev?.map((m) =>
-                m.id === matchupId ? { ...m, winner } : m
-            ) || null
+        setMatchups(
+            (prev) =>
+                prev?.map((m) => (m.id === matchupId ? { ...m, winner } : m)) ||
+                null
         );
+    };
+    const allMatchupsVoted = matchups?.every((m) => m.winner) ?? false;
+
+    const computeLeaderboard = () => {
+        const scores: { [seed: string]: number } = {};
+
+        matchups?.forEach(({ winner }) => {
+            if (winner) {
+                scores[winner] = (scores[winner] || 0) + 1;
+            }
+        });
+
+        const allPlayers = new Set(seeds.filter((s) => s.trim() !== ""));
+        allPlayers.forEach((player) => {
+            if (!scores[player]) scores[player] = 0;
+        });
+
+        return Object.entries(scores)
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, score], index) => ({
+                rank: index + 1,
+                name,
+                wins: score,
+            }));
     };
 
     return (
@@ -41,22 +65,42 @@ const RoundRobin = () => {
             {!matchups && (
                 <>
                     <SeedInputList seeds={seeds} setSeeds={setSeeds} />
-                    <button onClick={generateMatchups} disabled={seeds.filter(Boolean).length < 2}>
+                    <button
+                        onClick={generateMatchups}
+                        disabled={seeds.filter(Boolean).length < 2}
+                    >
                         Generate Matchups
                     </button>
                 </>
             )}
 
             {matchups && (
-                <div className="matchup-grid">
-                    {matchups.map((matchup) => (
-                        <MatchupCard
-                            key={matchup.id}
-                            matchup={matchup}
-                            onVote={handleVote}
-                        />
-                    ))}
-                </div>
+                <>
+                    <div className="matchup-grid">
+                        {matchups.map((matchup) => (
+                            <MatchupCard
+                                key={matchup.id}
+                                matchup={matchup}
+                                onVote={handleVote}
+                            />
+                        ))}
+                    </div>
+
+                    {allMatchupsVoted && (
+                        <div className="leaderboard">
+                            <h3>Leaderboard</h3>
+                            <ol>
+                                {computeLeaderboard().map((entry) => (
+                                    <li key={entry.name}>
+                                        #{entry.rank} - {entry.name}:{" "}
+                                        {entry.wins} win
+                                        {entry.wins !== 1 ? "s" : ""}
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
