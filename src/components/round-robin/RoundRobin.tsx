@@ -25,8 +25,7 @@ const RoundRobin = () => {
             }
         }
 
-        for (let i = pairs.length - 1; i > 0; i--) {
-            //fisher-yates algorithm for shuffling
+        for (let i = pairs.length - 1; i > 0; i--) { //fisher-yates algorithm for shuffling
             const j = Math.floor(Math.random() * (i + 1));
             [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
         }
