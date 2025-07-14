@@ -1,5 +1,5 @@
 import React from "react";
-
+import './matchupcards.css';
 type Props = {
     matchup: {
         id: number;
@@ -15,8 +15,12 @@ const MatchupCard: React.FC<Props> = ({ matchup, onVote }) => {
 
     return (
         <div className="matchup-card">
-            <h4>Matchup {id + 1}</h4>
-            <p>{a} vs {b}</p>
+            <h4 className="matchup-title">Matchup {id + 1}</h4>
+            <div className="matchup-choices">
+            <div className="matchup-choice-a">{a} </div>
+            <div className="vs"> vs </div>
+            <div className="matchup-choice-b">{b}</div>
+            </div>
             {!winner ? (
                 <div className="vote-buttons">
                     <button onClick={() => onVote(id, a)}>{a}</button>

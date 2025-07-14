@@ -1,0 +1,35 @@
+.matchup-title{
+    font-size: 20pt;
+    color: red;
+}
+
+.matchup-choices{
+    font-size: 12pt;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.matchup-choice-a{
+    border-color: blue;
+    border-style:dashed;
+    border-width: 1px;
+    border-radius: 20px;
+    padding: 15px;
+}
+
+.matchup-choice-b{
+    border-color: red;
+    border-style:dashed;
+    border-width: 1px;
+    border-radius: 20px;
+    padding: 15px;
+}
+
+.vs{
+    font-size: 20pt;
+    color: black;
+    padding: 10px;
+    margin: 0 10px;
+    align-self: center;
+}

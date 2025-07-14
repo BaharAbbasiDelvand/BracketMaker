@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SeedInputList from "./SeedInputList";
-import MatchupCard from "./MatchUpCards";
+import MatchupCard from "../cards/MatchUpCards";
 
 type Matchup = {
     a: string;
@@ -16,16 +16,22 @@ const RoundRobin = () => {
     const generateMatchups = () => {
         const filled = seeds.filter((s) => s.trim() !== "");
         const pairs: Matchup[] = [];
-
+    
         let id = 0;
         for (let i = 0; i < filled.length; i++) {
             for (let j = i + 1; j < filled.length; j++) {
                 pairs.push({ a: filled[i], b: filled[j], id: id++ });
             }
         }
-
+    
+        for (let i = pairs.length - 1; i > 0; i--) { //fisher-yates algorithm for shuffling
+            const j = Math.floor(Math.random() * (i + 1));
+            [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+        }
+    
         setMatchups(pairs);
     };
+    
 
     const handleVote = (matchupId: number, winner: string) => {
         setMatchups(

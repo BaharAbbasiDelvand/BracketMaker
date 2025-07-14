@@ -5,7 +5,7 @@ type Props = {
     setSeeds: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const MAX_SEEDS = 30;
+const MAX_SEEDS = 30; //for now
 
 const SeedInputList: React.FC<Props> = ({ seeds, setSeeds }) => {
     const handleChange = (index: number, value: string) => {
