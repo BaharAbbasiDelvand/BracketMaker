@@ -9,13 +9,18 @@ const MAX_SEEDS = 30; //for now
 
 const SeedInputList: React.FC<Props> = ({ seeds, setSeeds }) => {
     const handleChange = (index: number, value: string) => {
+        const trimmedValue = value.trim();
+        const isDuplicate = seeds.some((s, i) => i !== index && s === trimmedValue);
+        if (isDuplicate) {
+            alert(`"${trimmedValue}" is already entered as a seed.`);
+            return;
+        }
         const updated = [...seeds];
-        updated[index] = value;
+        updated[index] = trimmedValue;
         setSeeds(updated);
     };
-
     const addSeed = () => {
-        if (seeds.length < MAX_SEEDS) {
+        if (seeds.length < MAX_SEEDS && !seeds.includes("")) {
             setSeeds([...seeds, ""]);
         }
     };
