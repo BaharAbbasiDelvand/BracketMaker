@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SeedInputList from "./SeedInputList";
 import MatchupCard from "../cards/MatchUpCards";
+import Leaderboard from "../leaderboard/Leaderboard";
 
 type Matchup = {
     a: string;
@@ -16,22 +17,22 @@ const RoundRobin = () => {
     const generateMatchups = () => {
         const filled = seeds.filter((s) => s.trim() !== "");
         const pairs: Matchup[] = [];
-    
+
         let id = 0;
         for (let i = 0; i < filled.length; i++) {
             for (let j = i + 1; j < filled.length; j++) {
                 pairs.push({ a: filled[i], b: filled[j], id: id++ });
             }
         }
-    
-        for (let i = pairs.length - 1; i > 0; i--) { //fisher-yates algorithm for shuffling
+
+        for (let i = pairs.length - 1; i > 0; i--) {
+            //fisher-yates algorithm for shuffling
             const j = Math.floor(Math.random() * (i + 1));
             [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
         }
-    
+
         setMatchups(pairs);
     };
-    
 
     const handleVote = (matchupId: number, winner: string) => {
         setMatchups(
@@ -41,29 +42,27 @@ const RoundRobin = () => {
         );
     };
     const allMatchupsVoted = matchups?.every((m) => m.winner) ?? false;
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const activeEl = document.activeElement;
 
-    const computeLeaderboard = () => {
-        const scores: { [seed: string]: number } = {};
-
-        matchups?.forEach(({ winner }) => {
-            if (winner) {
-                scores[winner] = (scores[winner] || 0) + 1;
+            if (
+                e.key === "Enter" &&
+                !matchups &&
+                activeEl instanceof HTMLInputElement &&
+                activeEl.classList.contains("seed-input")
+            ) {
+                const validSeeds = seeds.filter((s) => s.trim()).length;
+                if (validSeeds >= 2) {
+                    e.preventDefault();
+                    generateMatchups();
+                }
             }
-        });
+        };
 
-        const allPlayers = new Set(seeds.filter((s) => s.trim() !== ""));
-        allPlayers.forEach((player) => {
-            if (!scores[player]) scores[player] = 0;
-        });
-
-        return Object.entries(scores)
-            .sort((a, b) => b[1] - a[1])
-            .map(([name, score], index) => ({
-                rank: index + 1,
-                name,
-                wins: score,
-            }));
-    };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [seeds, matchups]);
 
     return (
         <div className="round-robin-container">
@@ -83,28 +82,18 @@ const RoundRobin = () => {
             {matchups && (
                 <>
                     <div className="matchup-grid">
-                        {matchups.map((matchup) => (
+                        {matchups.map((matchup, index) => (
                             <MatchupCard
                                 key={matchup.id}
                                 matchup={matchup}
                                 onVote={handleVote}
+                                displayNumber={index + 1}
                             />
                         ))}
                     </div>
 
                     {allMatchupsVoted && (
-                        <div className="leaderboard">
-                            <h3>Leaderboard</h3>
-                            <ol>
-                                {computeLeaderboard().map((entry) => (
-                                    <li key={entry.name}>
-                                        #{entry.rank} - {entry.name}:{" "}
-                                        {entry.wins} win
-                                        {entry.wins !== 1 ? "s" : ""}
-                                    </li>
-                                ))}
-                            </ol>
-                        </div>
+                        <Leaderboard seeds={seeds} matchups={matchups} />
                     )}
                 </>
             )}

@@ -19,6 +19,16 @@ const SeedInputList: React.FC<Props> = ({ seeds, setSeeds }) => {
             setSeeds([...seeds, ""]);
         }
     };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        if (e.key === "Tab" && index === seeds.length - 1 && !e.shiftKey) {
+            addSeed(); 
+            setTimeout(() => {
+                const inputs = document.querySelectorAll<HTMLInputElement>(".seed-input");
+                inputs[inputs.length - 1]?.focus();
+            }, 0);
+        }
+    };
+    
 
     return (
         <div>
@@ -29,6 +39,7 @@ const SeedInputList: React.FC<Props> = ({ seeds, setSeeds }) => {
                     onChange={(e) => handleChange(index, e.target.value)}
                     placeholder={`Seed ${index + 1}`}
                     className="seed-input"
+                    onKeyDown={(e) => handleKeyDown(e, index)}
                 />
             ))}
             <button onClick={addSeed} disabled={seeds.length >= MAX_SEEDS}>
