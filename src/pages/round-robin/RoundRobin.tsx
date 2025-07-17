@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import SeedInputList from "./SeedInputList";
-import MatchupCard from "../cards/MatchUpCards";
-import Leaderboard from "../leaderboard/Leaderboard";
+import SeedInputList from "../../components/input/SeedInput";
+import MatchupCard from "../../components/cards/MatchUpCards";
+import Leaderboard from "../../components/leaderboard/Leaderboard";
+import { useSeedStore } from "../../lib/seeds-zustand";
 
 type Matchup = {
     a: string;
@@ -11,11 +12,11 @@ type Matchup = {
 };
 
 const RoundRobin = () => {
-    const [seeds, setSeeds] = useState<string[]>([""]);
     const [matchups, setMatchups] = useState<Matchup[] | null>(null);
+    const { seeds, invalidIndexes, setInvalidIndexes } = useSeedStore();
 
     const generateMatchups = () => {
-        const filled = seeds.filter((s) => s.trim() !== "");
+        const filled = seeds.filter((s: string) => s.trim() !== "");
         const pairs: Matchup[] = [];
 
         let id = 0;
@@ -51,33 +52,45 @@ const RoundRobin = () => {
                 activeEl instanceof HTMLInputElement &&
                 activeEl.classList.contains("seed-input")
             ) {
-                const validSeeds = seeds.filter((s) => s.trim()).length;
+                const validSeeds = seeds.filter((s:string) => s.trim()).length;
                 if (validSeeds >= 2) {
                     e.preventDefault();
                     generateMatchups();
                 }
             }
         };
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [seeds, matchups]);
+    const hasAnyDuplicates = seeds.some(
+        (s: string, i: number) => s && seeds.findIndex((x:string) => x === s) !== i
+    );
 
     return (
         <div className="round-robin-container">
-            <h2>Enter Songs</h2>
+            <h2>Enter Seeds</h2>
             {!matchups && (
                 <>
-                    <SeedInputList seeds={seeds} setSeeds={setSeeds} />
+                    <SeedInputList/>
                     <button
-                        onClick={generateMatchups}
+                        onClick={() => {
+                            if (hasAnyDuplicates) {
+                                const dups: number[] = [];
+                                seeds.forEach((s: string, i:number) => {
+                                    if (s && seeds.findIndex((x:string) => x === s) !== i) dups.push(i);
+                                });
+                                setInvalidIndexes(dups);
+                                return;
+                            }
+                            setInvalidIndexes([]);
+                            generateMatchups();
+                        }}
                         disabled={seeds.filter(Boolean).length < 2}
                     >
                         Generate Matchups
                     </button>
                 </>
             )}
-
             {matchups && (
                 <>
                     <div className="matchup-grid">
@@ -90,7 +103,6 @@ const RoundRobin = () => {
                             />
                         ))}
                     </div>
-
                     {allMatchupsVoted && (
                         <Leaderboard seeds={seeds} matchups={matchups} />
                     )}

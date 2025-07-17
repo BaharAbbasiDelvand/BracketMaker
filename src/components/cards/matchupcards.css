@@ -36,3 +36,11 @@
     margin: 0 10px;
     align-self: center;
 }
+.selectable-card {
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.selectable-card:hover {
+    transform: scale(1.05);
+}

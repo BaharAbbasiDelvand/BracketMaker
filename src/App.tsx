@@ -1,8 +1,8 @@
 import "./App.css";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import RoundRobin from "./components/round-robin/RoundRobin";
+import RoundRobin from "./pages/round-robin/RoundRobin";
 import SingleElimination from "./components/single-elimination/SingleElimination";
-import { Home } from "./components/home/Home";
+import { Home } from "./pages/home/Home";
 function App() {
     return (
         <Router>
