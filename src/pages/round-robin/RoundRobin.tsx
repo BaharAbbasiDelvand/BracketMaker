@@ -26,7 +26,8 @@ const RoundRobin = () => {
             }
         }
 
-        for (let i = pairs.length - 1; i > 0; i--) { //fisher-yates algorithm for shuffling
+        for (let i = pairs.length - 1; i > 0; i--) {
+            //fisher-yates algorithm for shuffling
             const j = Math.floor(Math.random() * (i + 1));
             [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
         }
@@ -52,10 +53,31 @@ const RoundRobin = () => {
                 activeEl instanceof HTMLInputElement &&
                 activeEl.classList.contains("seed-input")
             ) {
-                const validSeeds = seeds.filter((s:string) => s.trim()).length;
+                const validSeeds = seeds.filter((s: string) => s.trim()).length;
+                const hasDuplicates = seeds.some(
+                    (s: string, i: number) =>
+                        s && seeds.findIndex((x: string) => x === s) !== i
+                );
+
                 if (validSeeds >= 2) {
                     e.preventDefault();
-                    generateMatchups();
+
+                    if (hasDuplicates) {
+                        const dups: number[] = [];
+                        seeds.forEach((s: string, i: number) => {
+                            if (
+                                s &&
+                                seeds.findIndex((x: string) => x === s) !== i
+                            ) {
+                                dups.push(i);
+                            }
+                        });
+                        setInvalidIndexes(dups); 
+                        return;
+                    }
+
+                    setInvalidIndexes([]);
+                    generateMatchups(); 
                 }
             }
         };
@@ -63,7 +85,8 @@ const RoundRobin = () => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [seeds, matchups]);
     const hasAnyDuplicates = seeds.some(
-        (s: string, i: number) => s && seeds.findIndex((x:string) => x === s) !== i
+        (s: string, i: number) =>
+            s && seeds.findIndex((x: string) => x === s) !== i
     );
 
     return (
@@ -71,13 +94,19 @@ const RoundRobin = () => {
             <h2>Enter Seeds</h2>
             {!matchups && (
                 <>
-                    <SeedInputList/>
+                    <SeedInputList />
                     <button
                         onClick={() => {
                             if (hasAnyDuplicates) {
                                 const dups: number[] = [];
-                                seeds.forEach((s: string, i:number) => {
-                                    if (s && seeds.findIndex((x:string) => x === s) !== i) dups.push(i);
+                                seeds.forEach((s: string, i: number) => {
+                                    if (
+                                        s &&
+                                        seeds.findIndex(
+                                            (x: string) => x === s
+                                        ) !== i
+                                    )
+                                        dups.push(i);
                                 });
                                 setInvalidIndexes(dups);
                                 return;

@@ -1,11 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function DoubleElimination() {
-  return (
-    <div>
-      D.E.
-    </div>
-  )
+    return <div>D.E.</div>;
 }
 
-export default DoubleElimination
+export default DoubleElimination;
