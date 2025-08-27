@@ -1,6 +1,6 @@
 import React from "react";
-import Card from 'react-bootstrap/Card';
-import './matchupcards.css';
+import Card from "react-bootstrap/Card";
+import "./matchupcards.css";
 
 type Props = {
     matchup: {
@@ -13,22 +13,17 @@ type Props = {
     onVote: (id: number, winner: string) => void;
 };
 
-const colorVariants = [
-    'primary',
-    'secondary',
-    'success',
-    'danger',
-    'warning',
-    'info',
-    'light',
-    'dark',
-];
+// pastel generator
+const pastelColorGenerator = (i: number) => {
+    const hue = (i * 47) % 360;
+    return `hsl(${hue}, 70%, 85%)`; 
+};
 
 const MatchupCard: React.FC<Props> = ({ matchup, displayNumber, onVote }) => {
     const { id, a, b, winner } = matchup;
 
-    const variantA = colorVariants[id % colorVariants.length];
-    const variantB = colorVariants[(id + 1) % colorVariants.length];
+    const colorA = pastelColorGenerator(id * 2);
+    const colorB = pastelColorGenerator(id * 2 + 1);
 
     return (
         <div className="matchup-card">
@@ -39,13 +34,17 @@ const MatchupCard: React.FC<Props> = ({ matchup, displayNumber, onVote }) => {
                     onClick={() => !winner && onVote(id, a)}
                 >
                     <Card
-                        bg={variantA}
-                        text={variantA === 'light' ? 'dark' : 'white'}
-                        style={{ width: '18rem' }}
-                        className="mb-2"
+                        style={{
+                            width: "18rem",
+                            backgroundColor: colorA,
+                            border: "none",
+                        }}
+                        className="mb-2 shadow-sm rounded-3"
                     >
                         <Card.Body>
-                            <Card.Title>{a}</Card.Title>
+                            <Card.Title style={{ color: "#333" }}>
+                                {a}
+                            </Card.Title>
                         </Card.Body>
                     </Card>
                 </div>
@@ -57,13 +56,17 @@ const MatchupCard: React.FC<Props> = ({ matchup, displayNumber, onVote }) => {
                     onClick={() => !winner && onVote(id, b)}
                 >
                     <Card
-                        bg={variantB}
-                        text={variantB === 'light' ? 'dark' : 'white'}
-                        style={{ width: '18rem' }}
-                        className="mb-2"
+                        style={{
+                            width: "18rem",
+                            backgroundColor: colorB,
+                            border: "none",
+                        }}
+                        className="mb-2 shadow-sm rounded-3"
                     >
                         <Card.Body>
-                            <Card.Title>{b}</Card.Title>
+                            <Card.Title style={{ color: "#333" }}>
+                                {b}
+                            </Card.Title>
                         </Card.Body>
                     </Card>
                 </div>

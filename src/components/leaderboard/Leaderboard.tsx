@@ -1,5 +1,6 @@
 import React from "react";
-
+import Carousel from "react-bootstrap/Carousel";
+import './leaderboard.css';
 type Matchup = {
     a: string;
     b: string;
@@ -39,15 +40,30 @@ const Leaderboard: React.FC<Props> = ({ seeds, matchups }) => {
     const entries = computeLeaderboard();
 
     return (
-        <div className="leaderboard">
-            <h3>Leaderboard</h3>
-            <ol>
+        <div className="leaderboard-container">
+            <h3 className="leaderboard-title">🏆 Leaderboard</h3>
+            <Carousel controls indicators={false} interval={null}>
                 {entries.map((entry) => (
-                    <li key={entry.name}>
-                        #{entry.rank} - {entry.name}: {entry.wins} win{entry.wins !== 1 ? "s" : ""}
-                    </li>
+                    <Carousel.Item key={entry.name}>
+                        <div
+                            className="leaderboard-entry"
+                            
+                        >
+                            
+                                <h2>#{entry.rank}</h2>
+                                <h3>{entry.name}</h3>
+                                <p>{entry.wins} win{entry.wins !== 1 ? "s" : ""}</p>
+                        </div>
+                        <Carousel.Caption>
+                            <h5 className="entry-title">{entry.name}</h5>
+                            <div className="entry-subtitle">
+                                Currently ranked #{entry.rank} with {entry.wins} win
+                                {entry.wins !== 1 ? "s" : ""}
+                            </div>
+                        </Carousel.Caption>
+                    </Carousel.Item>
                 ))}
-            </ol>
+            </Carousel>
         </div>
     );
 };

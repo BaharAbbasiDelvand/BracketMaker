@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SeedInputList from "../../components/input/SeedInput";
 import MatchupCard from "../../components/cards/MatchUpCards";
 import Leaderboard from "../../components/leaderboard/Leaderboard";
@@ -13,9 +13,13 @@ type Matchup = {
 
 const RoundRobin = () => {
     const [matchups, setMatchups] = useState<Matchup[] | null>(null);
-    const { seeds, invalidIndexes, setInvalidIndexes } = useSeedStore();
-
-    const generateMatchups = () => {
+    const { seeds, setInvalidIndexes } = useSeedStore();
+    // pastel generator for inputs
+    const pastelColorGenerator = (i: number) => {
+        const hue = (i * 47) % 360;
+        return `hsl(${hue} 65% 92%)`;
+    };
+    const generateMatchups = useCallback(() => {
         const filled = seeds.filter((s: string) => s.trim() !== "");
         const pairs: Matchup[] = [];
 
@@ -26,14 +30,14 @@ const RoundRobin = () => {
             }
         }
 
+        // fisher–yates algorithm for shuffling
         for (let i = pairs.length - 1; i > 0; i--) {
-            //fisher-yates algorithm for shuffling
             const j = Math.floor(Math.random() * (i + 1));
             [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
         }
 
         setMatchups(pairs);
-    };
+    }, [seeds]);
 
     const handleVote = (matchupId: number, winner: string) => {
         setMatchups(
@@ -72,18 +76,20 @@ const RoundRobin = () => {
                                 dups.push(i);
                             }
                         });
-                        setInvalidIndexes(dups); 
+                        setInvalidIndexes(dups);
                         return;
                     }
 
                     setInvalidIndexes([]);
-                    generateMatchups(); 
+                    generateMatchups();
                 }
             }
         };
+
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [seeds, matchups]);
+    }, [seeds, matchups, setInvalidIndexes, generateMatchups]);
+
     const hasAnyDuplicates = seeds.some(
         (s: string, i: number) =>
             s && seeds.findIndex((x: string) => x === s) !== i
@@ -96,6 +102,7 @@ const RoundRobin = () => {
                 <>
                     <SeedInputList />
                     <button
+                        type="button"
                         onClick={() => {
                             if (hasAnyDuplicates) {
                                 const dups: number[] = [];
@@ -105,8 +112,9 @@ const RoundRobin = () => {
                                         seeds.findIndex(
                                             (x: string) => x === s
                                         ) !== i
-                                    )
+                                    ) {
                                         dups.push(i);
+                                    }
                                 });
                                 setInvalidIndexes(dups);
                                 return;
@@ -115,6 +123,7 @@ const RoundRobin = () => {
                             generateMatchups();
                         }}
                         disabled={seeds.filter(Boolean).length < 2}
+                        className="btn btn-primary btn-lg rounded-pill shadow-sm align-self-start"
                     >
                         Generate Matchups
                     </button>
@@ -124,14 +133,24 @@ const RoundRobin = () => {
                 <>
                     <div className="matchup-grid">
                         {matchups.map((matchup, index) => (
-                            <MatchupCard
+                            <div
                                 key={matchup.id}
-                                matchup={matchup}
-                                onVote={handleVote}
-                                displayNumber={index + 1}
-                            />
+                                className="p-3 rounded-3 shadow-sm"
+                                style={{
+                                    backgroundColor:
+                                        pastelColorGenerator(index),
+                                }}
+                            >
+                                <MatchupCard
+                                    key={matchup.id}
+                                    matchup={matchup}
+                                    onVote={handleVote}
+                                    displayNumber={index + 1}
+                                />
+                            </div>
                         ))}
                     </div>
+
                     {allMatchupsVoted && (
                         <Leaderboard seeds={seeds} matchups={matchups} />
                     )}
