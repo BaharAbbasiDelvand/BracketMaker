@@ -1,0 +1,175 @@
+.de-scroll {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 16px;
+}
+
+.de-stage {
+    position: relative;
+    background: #f3f3f3;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.de-stage::before {
+    content: "";
+    position: absolute;
+    top: -150px;
+    left: -50px;
+    width: calc(100% + 100px);
+    height: 210px;
+    background: #ff8700;
+    border-bottom-left-radius: 50% 100%;
+    border-bottom-right-radius: 50% 100%;
+}
+
+.de-title {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 3;
+}
+
+.de-title__top {
+    color: #1c4cff;
+    font-size: 66px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+.de-title__bottom {
+    color: #ff7a00;
+    font-size: 58px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+.de-side-label {
+    position: absolute;
+    left: 22px;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    z-index: 3;
+}
+
+.de-side-label--winner {
+    top: 650px;
+    color: #1c4cff;
+}
+
+.de-side-label--loser {
+    top: 1188px;
+    color: #ff7a00;
+}
+
+.de-panel-title {
+    position: absolute;
+    font-size: 14px;
+    font-weight: 800;
+    color: #444;
+    z-index: 3;
+}
+
+.de-lines {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.de-match {
+    position: absolute;
+    width: 180px;
+    height: 72px;
+    z-index: 2;
+}
+
+.de-match--winner {
+    color: #1c4cff;
+}
+
+.de-match--loser {
+    color: #ff7a00;
+}
+
+.de-match--final {
+    color: #666;
+}
+
+.de-team {
+    width: 180px;
+    height: 36px;
+    display: block;
+    border: 2px solid currentColor;
+    background: #f3f3f3;
+    color: inherit;
+    text-align: left;
+    padding: 0 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.de-team:first-child {
+    border-bottom-width: 1px;
+}
+
+.de-team:last-child {
+    border-top-width: 1px;
+}
+
+.de-team:not(:disabled) {
+    cursor: pointer;
+}
+
+.de-team:disabled {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.de-team--selected {
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.de-placeholder {
+    position: absolute;
+    width: 180px;
+    z-index: 2;
+    opacity: 0.45;
+}
+
+.de-placeholder__box {
+    height: 72px;
+    border: 2px dashed #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f3f3;
+    color: #777;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.de-winner-box {
+    position: absolute;
+    width: 180px;
+    min-height: 44px;
+    border: 2px solid #666;
+    background: #f3f3f3;
+    color: #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    z-index: 3;
+}
