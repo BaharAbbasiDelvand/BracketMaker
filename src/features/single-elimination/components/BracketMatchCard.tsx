@@ -36,6 +36,7 @@ export default function BracketMatchCard({
                     !!match.winner &&
                     !!team &&
                     match.winner.id === team.id;
+                const isLoser = !!match.winner && !!team && !isWinner;
 
                 return (
                     <button
@@ -44,9 +45,10 @@ export default function BracketMatchCard({
                         className={[
                             "se-team",
                             isWinner ? "se-team--winner" : "",
+                            isLoser ? "se-team--lost" : "",
                             team ? "" : "se-team--tbd",
                         ].join(" ")}
-                        disabled={!team}
+                        disabled={!team || isLoser}
                         onClick={() =>
                             onPick(match.roundIndex, match.matchIndex, teamIndex)
                         }

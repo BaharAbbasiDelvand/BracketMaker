@@ -142,7 +142,7 @@
 
 .se-names-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
     margin-top: 20px;
     padding-top: 20px;
@@ -303,6 +303,22 @@
     background: linear-gradient(90deg, #a7f3d0 0%, #d1fae5 100%);
 }
 
+.se-team--lost {
+    color: #b2bac6;
+    background: #f8fafc;
+    cursor: default;
+}
+
+.se-team--lost .se-team__name {
+    text-decoration: line-through;
+    text-decoration-color: #cbd5e1;
+}
+
+.se-team--lost .se-team__seed {
+    color: #b2bac6;
+    background: #eef2f6;
+}
+
 .se-team--tbd {
     color: #cbd5e1;
     cursor: default;
@@ -410,5 +426,9 @@
 
     .se-controls__actions {
         justify-content: space-between;
+    }
+
+    .se-names-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
