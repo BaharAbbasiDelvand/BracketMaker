@@ -6,52 +6,60 @@ import {
 
 export type BracketMatchCardProps = {
     match: BracketMatch;
-    side: "left" | "right" | "center";
-    connect?: boolean;
+    isLast: boolean;
+    isTop: boolean;
+    elbow: number;
     onPick: (roundIndex: number, matchIndex: number, teamIndex: 0 | 1) => void;
 };
 
 export default function BracketMatchCard({
     match,
-    side,
-    connect = true,
+    isLast,
+    isTop,
+    elbow,
     onPick,
 }: BracketMatchCardProps) {
+    const className = [
+        "se-match",
+        "se-match--arm",
+        isLast ? "se-match--final" : isTop ? "se-match--top" : "se-match--bottom",
+    ].join(" ");
+
     return (
         <div
-            className={[
-                "br-match",
-                `br-match--${side}`,
-                connect ? "br-match--connect" : "",
-            ].join(" ")}
+            className={className}
+            style={{ "--se-elbow": `${elbow}px` } as React.CSSProperties}
         >
-            <button
-                type="button"
-                className={[
-                    "br-team",
-                    match.winner?.id === match.teams[0]?.id
-                        ? "br-team--winner"
-                        : "",
-                ].join(" ")}
-                disabled={!match.teams[0]}
-                onClick={() => onPick(match.roundIndex, match.matchIndex, 0)}
-            >
-                {formatTeam(match.teams[0])}
-            </button>
+            {([0, 1] as const).map((teamIndex) => {
+                const team = match.teams[teamIndex];
+                const isWinner =
+                    !!match.winner &&
+                    !!team &&
+                    match.winner.id === team.id;
 
-            <button
-                type="button"
-                className={[
-                    "br-team",
-                    match.winner?.id === match.teams[1]?.id
-                        ? "br-team--winner"
-                        : "",
-                ].join(" ")}
-                disabled={!match.teams[1]}
-                onClick={() => onPick(match.roundIndex, match.matchIndex, 1)}
-            >
-                {formatTeam(match.teams[1])}
-            </button>
+                return (
+                    <button
+                        key={teamIndex}
+                        type="button"
+                        className={[
+                            "se-team",
+                            isWinner ? "se-team--winner" : "",
+                            team ? "" : "se-team--tbd",
+                        ].join(" ")}
+                        disabled={!team}
+                        onClick={() =>
+                            onPick(match.roundIndex, match.matchIndex, teamIndex)
+                        }
+                    >
+                        <span className="se-team__seed">
+                            {team ? team.seed : ""}
+                        </span>
+                        <span className="se-team__name">
+                            {formatTeam(team)}
+                        </span>
+                    </button>
+                );
+            })}
         </div>
     );
 }

@@ -1,12 +1,11 @@
-import React from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Shuffle, Users, Pencil, ChevronDown } from "lucide-react";
 import BracketView from "../../features/single-elimination/components/BracketView";
 import { useSingleEliminationTournament } from "../../features/single-elimination/hooks/useSingleEliminationTournament";
 import "./single-elimination.css";
 
 export default function SingleEliminationPage() {
     const {
-        step,
         teamCount,
         teamNames,
         rounds,
@@ -15,97 +14,111 @@ export default function SingleEliminationPage() {
         handleTeamCountChange,
         handleTeamNameChange,
         handleGenerate,
-        handleBack,
         handlePickWinner,
     } = useSingleEliminationTournament();
 
-    if (step === "setup") {
-        return (
-            <Container className="py-4">
-                <h1 className="mb-4">Single Elimination</h1>
+    const [showNames, setShowNames] = useState(true);
+    const hasBracket = rounds.length > 0;
 
-                <Card className="shadow-sm">
-                    <Card.Body>
-                        <Row className="g-3 mb-4">
-                            <Col md={4}>
-                                <Form.Group controlId="teamCount">
-                                    <Form.Label>Number of teams</Form.Label>
-                                    <Form.Select
-                                        value={teamCount}
-                                        onChange={(e) =>
-                                            handleTeamCountChange(
-                                                Number(e.target.value)
-                                            )
-                                        }
-                                    >
-                                        {allowedTeamCounts.map((count) => (
-                                            <option key={count} value={count}>
-                                                {count}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row className="g-3">
-                            {teamNames.map((teamName, index) => (
-                                <Col xs={12} md={6} lg={4} key={index}>
-                                    <Form.Group
-                                        controlId={`team-${index + 1}`}
-                                    >
-                                        <Form.Label>
-                                            Team {index + 1}
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={teamName}
-                                            onChange={(e) =>
-                                                handleTeamNameChange(
-                                                    index,
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            ))}
-                        </Row>
-
-                        <div className="mt-4 d-flex gap-2">
-                            <Button onClick={handleGenerate}>
-                                Generate Shuffled Bracket
-                            </Button>
-                        </div>
-                    </Card.Body>
-                </Card>
-            </Container>
-        );
-    }
+    const onGenerate = () => {
+        handleGenerate();
+        setShowNames(false);
+    };
 
     return (
-        <Container fluid className="py-4 px-3">
-            <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-                <div>
-                    <h1 className="mb-1">{teamCount} Team Single Elimination</h1>
-                    <div className="text-muted">
-                        Teams were shuffled randomly before being placed into
-                        the bracket.
+        <div className="se-page">
+            <div className="se-inner">
+                <h1 className="se-title">
+                    <span>Single Elimination</span>
+                </h1>
+
+                <section className="se-controls">
+                    <div className="se-controls__bar">
+                        <div className="se-field">
+                            <label htmlFor="se-team-count">
+                                <Users size={16} strokeWidth={2.2} />
+                                Number of teams
+                            </label>
+                            <select
+                                id="se-team-count"
+                                className="se-select"
+                                value={teamCount}
+                                onChange={(e) =>
+                                    handleTeamCountChange(Number(e.target.value))
+                                }
+                            >
+                                {allowedTeamCounts.map((count) => (
+                                    <option key={count} value={count}>
+                                        {count} teams
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="se-controls__actions">
+                            <button
+                                type="button"
+                                className="se-names-toggle"
+                                onClick={() => setShowNames((v) => !v)}
+                            >
+                                <Pencil size={15} strokeWidth={2.2} />
+                                {showNames ? "Hide names" : "Edit names"}
+                                <ChevronDown
+                                    size={15}
+                                    strokeWidth={2.4}
+                                    className={
+                                        showNames
+                                            ? "se-chevron se-chevron--open"
+                                            : "se-chevron"
+                                    }
+                                />
+                            </button>
+
+                            <button
+                                type="button"
+                                className="se-generate"
+                                onClick={onGenerate}
+                            >
+                                <Shuffle size={18} strokeWidth={2.3} />
+                                {hasBracket
+                                    ? "Reshuffle bracket"
+                                    : "Generate bracket"}
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <Button variant="secondary" onClick={handleBack}>
-                    Back to Setup
-                </Button>
+                    {showNames && (
+                        <div className="se-names-grid">
+                            {teamNames.map((teamName, index) => (
+                                <label className="se-name" key={index}>
+                                    <span className="se-name__seed">
+                                        {index + 1}
+                                    </span>
+                                    <input
+                                        type="text"
+                                        value={teamName}
+                                        placeholder={`Team ${index + 1}`}
+                                        onChange={(e) =>
+                                            handleTeamNameChange(
+                                                index,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                {hasBracket && (
+                    <BracketView
+                        rounds={rounds}
+                        champion={champion}
+                        onPick={handlePickWinner}
+                    />
+                )}
             </div>
-
-            {rounds.length > 0 && (
-                <BracketView
-                    rounds={rounds}
-                    champion={champion}
-                    onPick={handlePickWinner}
-                />
-            )}
-        </Container>
+        </div>
     );
 }

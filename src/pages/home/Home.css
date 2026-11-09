@@ -80,7 +80,7 @@
     width: 48px;
     height: 48px;
     border-radius: 14px;
-    font-size: 1.55rem;
+    color: var(--accent);
     background: color-mix(in srgb, var(--accent) 16%, white);
     border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
 }
@@ -110,10 +110,10 @@
     gap: 6px;
 }
 
-.home__card-cta span {
+.home__card-cta svg {
     transition: transform 0.18s ease;
 }
 
-.home__card:hover .home__card-cta span {
+.home__card:hover .home__card-cta svg {
     transform: translateX(4px);
 }

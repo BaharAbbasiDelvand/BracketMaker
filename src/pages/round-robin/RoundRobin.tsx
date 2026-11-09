@@ -3,6 +3,8 @@ import SeedInputList from "../../components/input/SeedInput";
 import MatchupCard from "../../components/cards/MatchUpCards";
 import Leaderboard from "../../components/leaderboard/Leaderboard";
 import { useSeedStore } from "../../lib/seeds-zustand";
+import { Sprout } from "lucide-react";
+import "./round-robin.css";
 
 type Matchup = {
     a: string;
@@ -96,8 +98,12 @@ const RoundRobin = () => {
     );
 
     return (
+        <div className="round-robin-page">
         <div className="round-robin-container">
-            <h2>Enter Seeds</h2>
+            <h2>
+                <span>Enter Seeds</span>
+                <Sprout size={30} strokeWidth={2.2} />
+            </h2>
             {!matchups && (
                 <>
                     <SeedInputList />
@@ -123,7 +129,7 @@ const RoundRobin = () => {
                             generateMatchups();
                         }}
                         disabled={seeds.filter(Boolean).length < 2}
-                        className="btn btn-primary btn-lg rounded-pill shadow-sm align-self-start"
+                        className="btn btn-primary btn-lg rounded-pill shadow-sm rr-generate"
                     >
                         Generate Matchups
                     </button>
@@ -156,6 +162,7 @@ const RoundRobin = () => {
                     )}
                 </>
             )}
+        </div>
         </div>
     );
 };
