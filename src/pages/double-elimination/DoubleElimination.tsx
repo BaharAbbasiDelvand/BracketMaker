@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Trophy, Shuffle, Users, Pencil, ChevronDown } from "lucide-react";
 import "./double-elimination.css";
 
 type Team = {
     id: string;
     name: string;
+    seed: number;
 };
 
 type Source =
@@ -51,6 +52,7 @@ function createTeam(name: string, index: number): Team {
     return {
         id: `team-${index + 1}-${safeName}`,
         name: safeName,
+        seed: index + 1,
     };
 }
 
@@ -246,9 +248,9 @@ function getMatchPositions(): Record<string, MatchPosition> {
 }
 
 function getColor(kind: MatchPosition["color"]): string {
-    if (kind === "winner") return "#1c4cff";
-    if (kind === "loser") return "#ff7a00";
-    return "#666666";
+    if (kind === "winner") return "#60a5fa";
+    if (kind === "loser") return "#fbbf24";
+    return "#a78bfa";
 }
 
 function rowCenterY(position: MatchPosition, row: 0 | 1) {
@@ -279,10 +281,10 @@ function line(
             points={points}
             fill="none"
             stroke={color}
-            strokeWidth={2}
+            strokeWidth={2.5}
             strokeLinejoin="round"
-            strokeLinecap="square"
-            strokeDasharray={dashed ? "6 4" : undefined}
+            strokeLinecap="round"
+            strokeDasharray={dashed ? "6 5" : undefined}
         />
     );
 }
@@ -428,45 +430,54 @@ function BracketMatch({
     match,
     position,
     onPick,
-    disabled = false,
 }: {
     match: MatchState;
     position: MatchPosition;
     onPick: (matchId: string, teamId: string) => void;
-    disabled?: boolean;
 }) {
     return (
         <div
             className={`de-match de-match--${position.color}`}
             style={{ left: position.x, top: position.y }}
         >
-            <button
-                type="button"
-                className={`de-team ${match.winner?.id === match.teams[0]?.id ? "de-team--selected" : ""}`}
-                disabled={!match.teams[0] || disabled}
-                onClick={() => match.teams[0] && onPick(match.id, match.teams[0].id)}
-            >
-                {match.teams[0]?.name ?? "TBD"}
-            </button>
+            {([0, 1] as const).map((teamIndex) => {
+                const team = match.teams[teamIndex];
+                const isWinner =
+                    !!match.winner && !!team && match.winner.id === team.id;
+                const isLoser = !!match.winner && !!team && !isWinner;
 
-            <button
-                type="button"
-                className={`de-team ${match.winner?.id === match.teams[1]?.id ? "de-team--selected" : ""}`}
-                disabled={!match.teams[1] || disabled}
-                onClick={() => match.teams[1] && onPick(match.id, match.teams[1].id)}
-            >
-                {match.teams[1]?.name ?? "TBD"}
-            </button>
+                return (
+                    <button
+                        key={teamIndex}
+                        type="button"
+                        className={[
+                            "de-team",
+                            isWinner ? "de-team--winner" : "",
+                            isLoser ? "de-team--lost" : "",
+                            team ? "" : "de-team--tbd",
+                        ].join(" ")}
+                        disabled={!team || isLoser}
+                        onClick={() => team && onPick(match.id, team.id)}
+                    >
+                        <span className="de-team__seed">
+                            {team ? team.seed : ""}
+                        </span>
+                        <span className="de-team__name">
+                            {team ? team.name : "TBD"}
+                        </span>
+                    </button>
+                );
+            })}
         </div>
     );
 }
 
 function DoubleElimination() {
-    const [step, setStep] = useState<"setup" | "bracket">("setup");
     const [teamNames, setTeamNames] = useState<string[]>(
         Array.from({ length: TEAM_COUNT }, (_, index) => `Team ${index + 1}`)
     );
     const [tournament, setTournament] = useState<Tournament | null>(null);
+    const [showNames, setShowNames] = useState(true);
 
     const positions = useMemo(() => getMatchPositions(), []);
     const resolved = useMemo(() => {
@@ -487,16 +498,7 @@ function DoubleElimination() {
 
     function handleGenerate() {
         setTournament(buildTournament(teamNames));
-        setStep("bracket");
-    }
-
-    function handleReshuffle() {
-        setTournament(buildTournament(teamNames));
-    }
-
-    function handleBack() {
-        setTournament(null);
-        setStep("setup");
+        setShowNames(false);
     }
 
     function handlePick(matchId: string, teamId: string) {
@@ -515,128 +517,183 @@ function DoubleElimination() {
         });
     }
 
-    if (step === "setup") {
-        return (
-            <Container className="py-4">
-                <h1 className="mb-4">Double Elimination</h1>
-
-                <Card className="shadow-sm">
-                    <Card.Body>
-                        <div className="mb-3 text-muted">
-                            Fixed 16-team layout aligned to the reference.
-                        </div>
-
-                        <Row className="g-3">
-                            {teamNames.map((teamName, index) => (
-                                <Col xs={12} md={6} lg={4} key={index}>
-                                    <Form.Group controlId={`double-team-${index + 1}`}>
-                                        <Form.Label>Team {index + 1}</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={teamName}
-                                            onChange={(e) => handleTeamNameChange(index, e.target.value)}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            ))}
-                        </Row>
-
-                        <div className="mt-4">
-                            <Button onClick={handleGenerate}>Generate Shuffled Bracket</Button>
-                        </div>
-                    </Card.Body>
-                </Card>
-            </Container>
-        );
-    }
-
-    if (!tournament || !resolved || !resolved.grandFinal || !resolved.resetFinal) {
-        return null;
-    }
+    const hasBracket =
+        !!tournament &&
+        !!resolved &&
+        !!resolved.grandFinal &&
+        !!resolved.resetFinal;
 
     return (
-        <Container fluid className="py-4 px-3">
-            <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-                <div>
-                    <h1 className="mb-1">16 Team Double Elimination</h1>
-                    <div className="text-muted">
-                        Fixed-position bracket. Click winners to advance them.
+        <div className="de-page">
+            <div className="de-inner">
+                <h1 className="de-title-h">
+                    <span>Double Elimination</span>
+                </h1>
+
+                <section className="de-controls">
+                    <div className="de-controls__bar">
+                        <div className="de-field">
+                            <label>
+                                <Users size={16} strokeWidth={2.2} />
+                                Number of teams
+                            </label>
+                            <div className="de-count">16 teams</div>
+                        </div>
+
+                        <div className="de-controls__actions">
+                            <button
+                                type="button"
+                                className="de-names-toggle"
+                                onClick={() => setShowNames((v) => !v)}
+                            >
+                                <Pencil size={15} strokeWidth={2.2} />
+                                {showNames ? "Hide names" : "Edit names"}
+                                <ChevronDown
+                                    size={15}
+                                    strokeWidth={2.4}
+                                    className={
+                                        showNames
+                                            ? "de-chevron de-chevron--open"
+                                            : "de-chevron"
+                                    }
+                                />
+                            </button>
+
+                            <button
+                                type="button"
+                                className="de-generate"
+                                onClick={handleGenerate}
+                            >
+                                <Shuffle size={18} strokeWidth={2.3} />
+                                {tournament
+                                    ? "Reshuffle bracket"
+                                    : "Generate bracket"}
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div className="d-flex gap-2">
-                    <Button variant="outline-primary" onClick={handleReshuffle}>
-                        Reshuffle
-                    </Button>
-                    <Button variant="secondary" onClick={handleBack}>
-                        Back to Setup
-                    </Button>
-                </div>
-            </div>
+                    {showNames && (
+                        <div className="de-names-grid">
+                            {teamNames.map((teamName, index) => (
+                                <label className="de-name" key={index}>
+                                    <span className="de-name__seed">
+                                        {index + 1}
+                                    </span>
+                                    <input
+                                        type="text"
+                                        value={teamName}
+                                        placeholder={`Team ${index + 1}`}
+                                        onChange={(e) =>
+                                            handleTeamNameChange(
+                                                index,
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </section>
 
-            <div className="de-scroll">
-                <div
-                    className="de-stage"
-                    style={{ width: `${STAGE_WIDTH}px`, height: `${STAGE_HEIGHT}px` }}
-                >
-                    <div className="de-title">
-                        <div className="de-title__top">16 TEAM</div>
-                        <div className="de-title__bottom">DOUBLE ELIMINATION</div>
-                    </div>
+                {hasBracket && tournament && resolved && (
+                    <div className="de-scroll">
+                        <div
+                            className="de-stage"
+                            style={{
+                                width: `${STAGE_WIDTH}px`,
+                                height: `${STAGE_HEIGHT}px`,
+                            }}
+                        >
+                            <div className="de-side-label de-side-label--winner">
+                                Winners bracket
+                            </div>
+                            <div className="de-side-label de-side-label--loser">
+                                Losers bracket
+                            </div>
 
-                    <div className="de-side-label de-side-label--winner">WINNERS BRACKET</div>
-                    <div className="de-side-label de-side-label--loser">LOSERS BRACKET</div>
+                            <div
+                                className="de-panel-title"
+                                style={{ left: 1510, top: 548 }}
+                            >
+                                Grand Final
+                            </div>
+                            <div
+                                className="de-panel-title"
+                                style={{ left: 1510, top: 738 }}
+                            >
+                                Reset Final
+                            </div>
+                            <div
+                                className="de-panel-title"
+                                style={{ left: 1514, top: 958 }}
+                            >
+                                Champion
+                            </div>
 
-                    <div className="de-panel-title" style={{ left: 1510, top: 544 }}>
-                        Grand Final
-                    </div>
-
-                    <div className="de-panel-title" style={{ left: 1510, top: 734 }}>
-                        Reset Final
-                    </div>
-
-                    <div className="de-panel-title" style={{ left: 1550, top: 954 }}>
-                        Winner
-                    </div>
-
-                    <BracketLines positions={positions} resetNeeded={resolved.resetNeeded} />
-
-                    {tournament.matches.map((match) => {
-                        const position = positions[match.id];
-                        const resolvedMatch = resolved.matchMap.get(match.id);
-
-                        if (!position || !resolvedMatch) {
-                            return null;
-                        }
-
-                        if (match.id === tournament.resetFinalId && !resolved.resetNeeded) {
-                            return (
-                                <div
-                                    key={match.id}
-                                    className="de-placeholder"
-                                    style={{ left: position.x, top: position.y }}
-                                >
-                                    <div className="de-placeholder__box">Only if needed</div>
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <BracketMatch
-                                key={match.id}
-                                match={resolvedMatch}
-                                position={position}
-                                onPick={handlePick}
+                            <BracketLines
+                                positions={positions}
+                                resetNeeded={resolved.resetNeeded}
                             />
-                        );
-                    })}
 
-                    <div className="de-winner-box" style={{ left: 1510, top: 986 }}>
-                        {resolved.champion?.name ?? "TBD"}
+                            {tournament.matches.map((match) => {
+                                const position = positions[match.id];
+                                const resolvedMatch = resolved.matchMap.get(
+                                    match.id
+                                );
+
+                                if (!position || !resolvedMatch) {
+                                    return null;
+                                }
+
+                                if (
+                                    match.id === tournament.resetFinalId &&
+                                    !resolved.resetNeeded
+                                ) {
+                                    return (
+                                        <div
+                                            key={match.id}
+                                            className="de-placeholder"
+                                            style={{
+                                                left: position.x,
+                                                top: position.y,
+                                            }}
+                                        >
+                                            <div className="de-placeholder__box">
+                                                Only if needed
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <BracketMatch
+                                        key={match.id}
+                                        match={resolvedMatch}
+                                        position={position}
+                                        onPick={handlePick}
+                                    />
+                                );
+                            })}
+
+                            <div
+                                className={
+                                    resolved.champion
+                                        ? "de-champion de-champion--crowned"
+                                        : "de-champion"
+                                }
+                                style={{ left: 1510, top: 986 }}
+                            >
+                                <Trophy size={20} strokeWidth={2.2} />
+                                <span className="de-champion__name">
+                                    {resolved.champion?.name ?? "TBD"}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
-        </Container>
+        </div>
     );
 }
 
