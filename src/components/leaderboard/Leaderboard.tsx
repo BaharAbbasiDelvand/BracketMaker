@@ -1,6 +1,7 @@
 import React from "react";
-import Carousel from "react-bootstrap/Carousel";
-import './leaderboard.css';
+import { Trophy } from "lucide-react";
+import "./leaderboard.css";
+
 type Matchup = {
     a: string;
     b: string;
@@ -40,30 +41,28 @@ const Leaderboard: React.FC<Props> = ({ seeds, matchups }) => {
     const entries = computeLeaderboard();
 
     return (
-        <div className="leaderboard-container">
-            <h3 className="leaderboard-title">🏆 Leaderboard</h3>
-            <Carousel controls indicators={false} interval={null}>
+        <div className="leaderboard">
+            <div className="leaderboard__head">
+                <Trophy size={22} strokeWidth={2.2} />
+                <h3>Leaderboard</h3>
+            </div>
+
+            <ol className="leaderboard__list">
                 {entries.map((entry) => (
-                    <Carousel.Item key={entry.name}>
-                        <div
-                            className="leaderboard-entry"
-                            
-                        >
-                            
-                                <h2>#{entry.rank}</h2>
-                                <h3>{entry.name}</h3>
-                                <p>{entry.wins} win{entry.wins !== 1 ? "s" : ""}</p>
-                        </div>
-                        <Carousel.Caption>
-                            <h5 className="entry-title">{entry.name}</h5>
-                            <div className="entry-subtitle">
-                                Currently ranked #{entry.rank} with {entry.wins} win
-                                {entry.wins !== 1 ? "s" : ""}
-                            </div>
-                        </Carousel.Caption>
-                    </Carousel.Item>
+                    <li
+                        key={entry.name}
+                        className={`lb-row lb-row--${
+                            entry.rank <= 3 ? entry.rank : "rest"
+                        }`}
+                    >
+                        <span className="lb-row__rank">{entry.rank}</span>
+                        <span className="lb-row__name">{entry.name}</span>
+                        <span className="lb-row__wins">
+                            {entry.wins} win{entry.wins !== 1 ? "s" : ""}
+                        </span>
+                    </li>
                 ))}
-            </Carousel>
+            </ol>
         </div>
     );
 };

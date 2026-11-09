@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import SeedInputList from "../../components/input/SeedInput";
-import MatchupCard from "../../components/cards/MatchUpCards";
+import MatchupDeck from "../../components/cards/MatchupDeck";
 import Leaderboard from "../../components/leaderboard/Leaderboard";
 import { useSeedStore } from "../../lib/seeds-zustand";
 import { Sprout } from "lucide-react";
@@ -16,11 +16,6 @@ type Matchup = {
 const RoundRobin = () => {
     const [matchups, setMatchups] = useState<Matchup[] | null>(null);
     const { seeds, setInvalidIndexes } = useSeedStore();
-    // pastel generator for inputs
-    const pastelColorGenerator = (i: number) => {
-        const hue = (i * 47) % 360;
-        return `hsl(${hue} 65% 92%)`;
-    };
     const generateMatchups = useCallback(() => {
         const filled = seeds.filter((s: string) => s.trim() !== "");
         const pairs: Matchup[] = [];
@@ -137,25 +132,7 @@ const RoundRobin = () => {
             )}
             {matchups && (
                 <>
-                    <div className="matchup-grid">
-                        {matchups.map((matchup, index) => (
-                            <div
-                                key={matchup.id}
-                                className="p-3 rounded-3 shadow-sm"
-                                style={{
-                                    backgroundColor:
-                                        pastelColorGenerator(index),
-                                }}
-                            >
-                                <MatchupCard
-                                    key={matchup.id}
-                                    matchup={matchup}
-                                    onVote={handleVote}
-                                    displayNumber={index + 1}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                    <MatchupDeck matchups={matchups} onVote={handleVote} />
 
                     {allMatchupsVoted && (
                         <Leaderboard seeds={seeds} matchups={matchups} />

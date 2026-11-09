@@ -1,12 +1,104 @@
-.leaderboard-container{
+.leaderboard {
+    max-width: 520px;
+    margin: 12px auto 0;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 20px;
+    padding: 22px 24px;
+    box-shadow: 0 16px 40px -28px rgba(100, 116, 139, 0.9);
+}
+
+.leaderboard__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.leaderboard__head svg {
+    color: #f59e0b;
+}
+
+.leaderboard__head h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.leaderboard__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
+    gap: 8px;
+}
+
+.lb-row {
+    display: flex;
     align-items: center;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #f8fafc;
+}
 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    width: 50%;
-    margin: 0 auto;
+.lb-row__rank {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #64748b;
+    background: #e2e8f0;
+}
 
+.lb-row__name {
+    flex: 1;
+    min-width: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lb-row__wins {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.lb-row--1 {
+    background: linear-gradient(90deg, #fef3c7 0%, #fffbeb 100%);
+}
+
+.lb-row--1 .lb-row__rank {
+    background: #fcd34d;
+    color: #92400e;
+}
+
+.lb-row--2 {
+    background: linear-gradient(90deg, #eef2f6 0%, #f8fafc 100%);
+}
+
+.lb-row--2 .lb-row__rank {
+    background: #cbd5e1;
+    color: #334155;
+}
+
+.lb-row--3 {
+    background: linear-gradient(90deg, #fde8d4 0%, #fff7ed 100%);
+}
+
+.lb-row--3 .lb-row__rank {
+    background: #fdba74;
+    color: #7c2d12;
 }

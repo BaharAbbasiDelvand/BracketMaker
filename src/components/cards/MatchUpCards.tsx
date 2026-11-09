@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "react-bootstrap/Card";
+import { Check } from "lucide-react";
 import "./matchupcards.css";
 
 type Props = {
@@ -13,70 +13,55 @@ type Props = {
     onVote: (id: number, winner: string) => void;
 };
 
-// pastel generator
-const pastelColorGenerator = (i: number) => {
-    const hue = (i * 47) % 360;
-    return `hsl(${hue}, 70%, 85%)`; 
-};
-
 const MatchupCard: React.FC<Props> = ({ matchup, displayNumber, onVote }) => {
     const { id, a, b, winner } = matchup;
+    const decided = !!winner;
 
-    const colorA = pastelColorGenerator(id * 2);
-    const colorB = pastelColorGenerator(id * 2 + 1);
+    const renderChoice = (team: string) => {
+        const isWinner = decided && winner === team;
+        const isLoser = decided && winner !== team;
+
+        return (
+            <button
+                type="button"
+                className={[
+                    "rr-choice",
+                    isWinner ? "rr-choice--winner" : "",
+                    isLoser ? "rr-choice--lost" : "",
+                ].join(" ")}
+                disabled={decided}
+                onClick={() => !decided && onVote(id, team)}
+            >
+                <span className="rr-choice__name">{team}</span>
+                {isWinner && (
+                    <Check
+                        size={18}
+                        strokeWidth={2.6}
+                        className="rr-choice__check"
+                    />
+                )}
+            </button>
+        );
+    };
 
     return (
         <div className="matchup-card">
-            <h4 className="matchup-title">Matchup {displayNumber}</h4>
-            <div className="matchup-choices">
-                <div
-                    className="selectable-card"
-                    onClick={() => !winner && onVote(id, a)}
-                >
-                    <Card
-                        style={{
-                            width: "18rem",
-                            backgroundColor: colorA,
-                            border: "none",
-                        }}
-                        className="mb-2 shadow-sm rounded-3"
-                    >
-                        <Card.Body>
-                            <Card.Title style={{ color: "#333" }}>
-                                {a}
-                            </Card.Title>
-                        </Card.Body>
-                    </Card>
-                </div>
-
-                <div className="vs">vs</div>
-
-                <div
-                    className="selectable-card"
-                    onClick={() => !winner && onVote(id, b)}
-                >
-                    <Card
-                        style={{
-                            width: "18rem",
-                            backgroundColor: colorB,
-                            border: "none",
-                        }}
-                        className="mb-2 shadow-sm rounded-3"
-                    >
-                        <Card.Body>
-                            <Card.Title style={{ color: "#333" }}>
-                                {b}
-                            </Card.Title>
-                        </Card.Body>
-                    </Card>
-                </div>
+            <div className="matchup-card__head">
+                <span className="matchup-card__num">
+                    Matchup {displayNumber}
+                </span>
+                {decided && (
+                    <span className="matchup-card__picked">
+                        Your pick: <strong>{winner}</strong>
+                    </span>
+                )}
             </div>
 
-            {winner && (
-                <p className="winner">
-                    Voted: <strong>{winner}</strong>
-                </p>
-            )}
+            <div className="matchup-choices">
+                {renderChoice(a)}
+                <span className="vs">vs</span>
+                {renderChoice(b)}
+            </div>
         </div>
     );
 };
