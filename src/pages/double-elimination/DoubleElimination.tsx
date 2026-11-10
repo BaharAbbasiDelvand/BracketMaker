@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Trophy, Shuffle, Users, Pencil, ChevronDown } from "lucide-react";
+import SaveShareBar from "../../components/share/SaveShareBar";
 import "./double-elimination.css";
 
 type Team = {
@@ -33,6 +34,11 @@ type Tournament = {
     resetFinalId: string;
 };
 
+export type DoubleEliminationSnapshot = {
+    teamNames: string[];
+    tournament: Tournament;
+};
+
 type MatchPosition = {
     x: number;
     y: number;
@@ -43,8 +49,8 @@ const TEAM_COUNT = 16;
 const BOX_WIDTH = 180;
 const BOX_HEIGHT = 72;
 const HALF_HEIGHT = BOX_HEIGHT / 2;
-const STAGE_WIDTH = 1640;
-const STAGE_HEIGHT = 1240;
+const STAGE_WIDTH = 2320;
+const STAGE_HEIGHT = 1400;
 
 function createTeam(name: string, index: number): Team {
     const safeName = name.trim() || `Team ${index + 1}`;
@@ -200,51 +206,59 @@ function resolveTournament(tournament: Tournament) {
     };
 }
 
+const COL_W = 280;
+const LEFT = 70;
+const colX = (col: number) => LEFT + col * COL_W;
+
 function getMatchPositions(): Record<string, MatchPosition> {
-    return {
-        W1: { x: 82, y: 154, color: "winner" },
-        W2: { x: 82, y: 240, color: "winner" },
-        W3: { x: 82, y: 358, color: "winner" },
-        W4: { x: 82, y: 444, color: "winner" },
-        W5: { x: 82, y: 562, color: "winner" },
-        W6: { x: 82, y: 648, color: "winner" },
-        W7: { x: 82, y: 766, color: "winner" },
-        W8: { x: 82, y: 852, color: "winner" },
+    const H = BOX_HEIGHT;
+    const topOf = (center: number) => center - H / 2;
 
-        W9: { x: 350, y: 197, color: "winner" },
-        W10: { x: 350, y: 401, color: "winner" },
-        W11: { x: 350, y: 605, color: "winner" },
-        W12: { x: 350, y: 809, color: "winner" },
+    const WB_TOP = 110;
+    const WB_PITCH = 96;
+    const wbC = (round: number, k: number) =>
+        WB_TOP +
+        H / 2 +
+        (WB_PITCH / 2) * (2 ** round - 1) +
+        k * (WB_PITCH * 2 ** round);
 
-        W13: { x: 640, y: 299, color: "winner" },
-        W14: { x: 640, y: 707, color: "winner" },
+    const LB_TOP = 920;
+    const LB_PITCH = 96;
+    const lbA = (k: number) => LB_TOP + H / 2 + k * LB_PITCH;
+    const lbB = (k: number) => (lbA(2 * k) + lbA(2 * k + 1)) / 2;
+    const lbC = () => (lbB(0) + lbB(1)) / 2;
 
-        W15: { x: 930, y: 503, color: "winner" },
-
-        L1: { x: 82, y: 926, color: "loser" },
-        L2: { x: 82, y: 1014, color: "loser" },
-        L3: { x: 82, y: 1102, color: "loser" },
-        L4: { x: 82, y: 1190, color: "loser" },
-
-        L5: { x: 350, y: 970, color: "loser" },
-        L6: { x: 350, y: 1146, color: "loser" },
-
-        L7: { x: 620, y: 970, color: "loser" },
-        L8: { x: 620, y: 1146, color: "loser" },
-
-        L9: { x: 900, y: 1058, color: "loser" },
-        L10: { x: 1180, y: 1058, color: "loser" },
-
-        L11: { x: 1360, y: 748, color: "loser" },
-        L12: { x: 1360, y: 748, color: "loser" },
-
-        L13: { x: 1180, y: 866, color: "loser" },
-
-        L14: { x: 1360, y: 748, color: "loser" },
-
-        GF: { x: 1510, y: 578, color: "final" },
-        RF: { x: 1510, y: 768, color: "final" },
+    const positions: Record<string, MatchPosition> = {};
+    const place = (
+        id: string,
+        col: number,
+        center: number,
+        color: MatchPosition["color"]
+    ) => {
+        positions[id] = { x: colX(col), y: topOf(center), color };
     };
+
+    for (let i = 0; i < 8; i += 1) place(`W${i + 1}`, 0, wbC(0, i), "winner");
+    for (let i = 0; i < 4; i += 1) place(`W${i + 9}`, 1, wbC(1, i), "winner");
+    place("W13", 2, wbC(2, 0), "winner");
+    place("W14", 2, wbC(2, 1), "winner");
+    place("W15", 3, wbC(3, 0), "winner");
+
+    for (let i = 0; i < 4; i += 1) place(`L${i + 1}`, 0, lbA(i), "loser");
+    for (let i = 0; i < 4; i += 1) place(`L${i + 5}`, 1, lbA(i), "loser");
+    place("L9", 2, lbB(0), "loser");
+    place("L10", 2, lbB(1), "loser");
+    place("L11", 3, lbB(0), "loser");
+    place("L12", 3, lbB(1), "loser");
+    place("L13", 4, lbC(), "loser");
+    place("L14", 5, lbC(), "loser");
+
+    const gfCenter = (wbC(3, 0) + lbC()) / 2;
+    place("GF", 6, gfCenter, "final");
+    place("RF", 6, gfCenter + 160, "final");
+    place("CH", 7, gfCenter, "final");
+
+    return positions;
 }
 
 function getColor(kind: MatchPosition["color"]): string {
@@ -313,14 +327,8 @@ function BracketLines({
 
     for (let i = 1; i <= 8; i += 1) {
         const pos = positions[`W${i}`];
-        nodes.push(line(`w-seed-a-${i}`, `18,${rowCenterY(pos, 0)} ${pos.x},${rowCenterY(pos, 0)}`, blue));
-        nodes.push(line(`w-seed-b-${i}`, `18,${rowCenterY(pos, 1)} ${pos.x},${rowCenterY(pos, 1)}`, blue));
-    }
-
-    for (let i = 1; i <= 4; i += 1) {
-        const pos = positions[`L${i}`];
-        nodes.push(line(`l-seed-a-${i}`, `18,${rowCenterY(pos, 0)} ${pos.x},${rowCenterY(pos, 0)}`, orange));
-        nodes.push(line(`l-seed-b-${i}`, `18,${rowCenterY(pos, 1)} ${pos.x},${rowCenterY(pos, 1)}`, orange));
+        nodes.push(line(`w-seed-a-${i}`, `${pos.x - 36},${rowCenterY(pos, 0)} ${pos.x},${rowCenterY(pos, 0)}`, blue));
+        nodes.push(line(`w-seed-b-${i}`, `${pos.x - 36},${rowCenterY(pos, 1)} ${pos.x},${rowCenterY(pos, 1)}`, blue));
     }
 
     const directFeeds: Array<[string, string, 0 | 1, string]> = [
@@ -342,25 +350,22 @@ function BracketLines({
         ["W14", "W15", 1, blue],
 
         ["L1", "L5", 0, orange],
-        ["W9", "L5", 1, orange],
         ["L2", "L6", 0, orange],
-        ["W10", "L6", 1, orange],
-
         ["L3", "L7", 0, orange],
-        ["W11", "L7", 1, orange],
         ["L4", "L8", 0, orange],
-        ["W12", "L8", 1, orange],
 
         ["L5", "L9", 0, orange],
         ["L6", "L9", 1, orange],
         ["L7", "L10", 0, orange],
         ["L8", "L10", 1, orange],
 
-        ["L9", "L13", 0, orange],
-        ["L10", "L13", 1, orange],
+        ["L9", "L11", 0, orange],
+        ["L10", "L12", 0, orange],
+
+        ["L11", "L13", 0, orange],
+        ["L12", "L13", 1, orange],
 
         ["L13", "L14", 0, orange],
-        ["W15", "L14", 1, orange],
 
         ["W15", "GF", 0, gray],
         ["L14", "GF", 1, gray],
@@ -472,12 +477,19 @@ function BracketMatch({
     );
 }
 
-function DoubleElimination() {
+type Props = {
+    initial?: DoubleEliminationSnapshot;
+};
+
+function DoubleElimination({ initial }: Props) {
     const [teamNames, setTeamNames] = useState<string[]>(
-        Array.from({ length: TEAM_COUNT }, (_, index) => `Team ${index + 1}`)
+        initial?.teamNames ??
+            Array.from({ length: TEAM_COUNT }, (_, index) => `Team ${index + 1}`)
     );
-    const [tournament, setTournament] = useState<Tournament | null>(null);
-    const [showNames, setShowNames] = useState(true);
+    const [tournament, setTournament] = useState<Tournament | null>(
+        initial?.tournament ?? null
+    );
+    const [showNames, setShowNames] = useState(!initial);
 
     const positions = useMemo(() => getMatchPositions(), []);
     const resolved = useMemo(() => {
@@ -569,6 +581,23 @@ function DoubleElimination() {
                                     ? "Reshuffle bracket"
                                     : "Generate bracket"}
                             </button>
+
+                            <SaveShareBar
+                                canSave={hasBracket}
+                                getPayload={() =>
+                                    hasBracket && tournament
+                                        ? {
+                                              format: "double_elim",
+                                              name: null,
+                                              teams: teamNames,
+                                              state: {
+                                                  teamNames,
+                                                  tournament,
+                                              },
+                                          }
+                                        : null
+                                }
+                            />
                         </div>
                     </div>
 
@@ -614,19 +643,28 @@ function DoubleElimination() {
 
                             <div
                                 className="de-panel-title"
-                                style={{ left: 1510, top: 548 }}
+                                style={{
+                                    left: positions.GF.x,
+                                    top: positions.GF.y - 30,
+                                }}
                             >
                                 Grand Final
                             </div>
                             <div
                                 className="de-panel-title"
-                                style={{ left: 1510, top: 738 }}
+                                style={{
+                                    left: positions.RF.x,
+                                    top: positions.RF.y - 30,
+                                }}
                             >
                                 Reset Final
                             </div>
                             <div
                                 className="de-panel-title"
-                                style={{ left: 1514, top: 958 }}
+                                style={{
+                                    left: positions.CH.x,
+                                    top: positions.CH.y - 30,
+                                }}
                             >
                                 Champion
                             </div>
@@ -682,7 +720,10 @@ function DoubleElimination() {
                                         ? "de-champion de-champion--crowned"
                                         : "de-champion"
                                 }
-                                style={{ left: 1510, top: 986 }}
+                                style={{
+                                    left: positions.CH.x,
+                                    top: positions.CH.y,
+                                }}
                             >
                                 <Trophy size={20} strokeWidth={2.2} />
                                 <span className="de-champion__name">

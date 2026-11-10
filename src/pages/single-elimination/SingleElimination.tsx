@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import { Shuffle, Users, Pencil, ChevronDown } from "lucide-react";
 import BracketView from "../../features/single-elimination/components/BracketView";
-import { useSingleEliminationTournament } from "../../features/single-elimination/hooks/useSingleEliminationTournament";
+import {
+    useSingleEliminationTournament,
+    type SingleEliminationSnapshot,
+} from "../../features/single-elimination/hooks/useSingleEliminationTournament";
+import SaveShareBar from "../../components/share/SaveShareBar";
 import "./single-elimination.css";
 
-export default function SingleEliminationPage() {
+type Props = {
+    initial?: SingleEliminationSnapshot;
+};
+
+export default function SingleEliminationPage({ initial }: Props) {
     const {
         teamCount,
         teamNames,
@@ -15,7 +23,7 @@ export default function SingleEliminationPage() {
         handleTeamNameChange,
         handleGenerate,
         handlePickWinner,
-    } = useSingleEliminationTournament();
+    } = useSingleEliminationTournament(initial);
 
     const [showNames, setShowNames] = useState(true);
     const hasBracket = rounds.length > 0;
@@ -84,6 +92,24 @@ export default function SingleEliminationPage() {
                                     ? "Reshuffle bracket"
                                     : "Generate bracket"}
                             </button>
+
+                            <SaveShareBar
+                                canSave={hasBracket}
+                                getPayload={() =>
+                                    hasBracket
+                                        ? {
+                                              format: "single_elim",
+                                              name: null,
+                                              teams: teamNames,
+                                              state: {
+                                                  teamCount,
+                                                  teamNames,
+                                                  rounds,
+                                              },
+                                          }
+                                        : null
+                                }
+                            />
                         </div>
                     </div>
 

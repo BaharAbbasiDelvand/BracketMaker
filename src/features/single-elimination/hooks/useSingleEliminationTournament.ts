@@ -10,6 +10,12 @@ import {
 
 type Step = "setup" | "bracket";
 
+export type SingleEliminationSnapshot = {
+    teamCount: number;
+    teamNames: string[];
+    rounds: BracketRound[];
+};
+
 type UseSingleEliminationTournamentResult = {
     step: Step;
     teamCount: number;
@@ -28,13 +34,18 @@ type UseSingleEliminationTournamentResult = {
     ) => void;
 };
 
-export function useSingleEliminationTournament(): UseSingleEliminationTournamentResult {
-    const [step, setStep] = useState<Step>("setup");
-    const [teamCount, setTeamCount] = useState<number>(16);
-    const [teamNames, setTeamNames] = useState<string[]>(
-        Array.from({ length: 16 }, (_, index) => `Team ${index + 1}`)
+export function useSingleEliminationTournament(
+    initial?: SingleEliminationSnapshot
+): UseSingleEliminationTournamentResult {
+    const [step, setStep] = useState<Step>(
+        initial && initial.rounds.length > 0 ? "bracket" : "setup"
     );
-    const [rounds, setRounds] = useState<BracketRound[]>([]);
+    const [teamCount, setTeamCount] = useState<number>(initial?.teamCount ?? 16);
+    const [teamNames, setTeamNames] = useState<string[]>(
+        initial?.teamNames ??
+            Array.from({ length: 16 }, (_, index) => `Team ${index + 1}`)
+    );
+    const [rounds, setRounds] = useState<BracketRound[]>(initial?.rounds ?? []);
 
     const champion = useMemo(() => getChampion(rounds), [rounds]);
 

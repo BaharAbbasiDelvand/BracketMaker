@@ -204,12 +204,12 @@
 }
 
 .de-side-label--winner {
-    top: 560px;
+    top: 580px;
     color: #60a5fa;
 }
 
 .de-side-label--loser {
-    top: 1150px;
+    top: 1200px;
     color: #f59e0b;
 }
 

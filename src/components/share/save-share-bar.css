@@ -1,0 +1,107 @@
+.share-bar {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.share-bar__save {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(120deg, #8b5cf6 0%, #6366f1 100%);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 14px 26px -14px rgba(99, 102, 241, 0.95);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.share-bar__save:not(:disabled):hover {
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.05);
+    box-shadow: 0 20px 34px -14px rgba(99, 102, 241, 1);
+}
+
+.share-bar__save:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+}
+
+.share-bar__spin {
+    animation: share-spin 0.9s linear infinite;
+}
+
+@keyframes share-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.share-bar--done {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.share-bar__link {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 8px;
+    background: #ffffff;
+    border: 1.5px solid rgba(148, 163, 184, 0.35);
+    border-radius: 12px;
+    padding: 6px 6px 6px 14px;
+    max-width: 100%;
+}
+
+.share-bar__link input {
+    min-width: 220px;
+    max-width: 360px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.share-bar__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(120deg, #8b5cf6 0%, #6366f1 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: filter 0.15s ease;
+}
+
+.share-bar__copy:hover {
+    filter: brightness(1.07);
+}
+
+.share-bar__hint {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.share-bar__error {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #e11d48;
+}

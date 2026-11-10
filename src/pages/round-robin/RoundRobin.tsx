@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import SeedInputList from "../../components/input/SeedInput";
 import MatchupDeck from "../../components/cards/MatchupDeck";
 import Leaderboard from "../../components/leaderboard/Leaderboard";
+import SaveShareBar from "../../components/share/SaveShareBar";
 import { useSeedStore } from "../../lib/seeds-zustand";
 import { Sprout } from "lucide-react";
 import "./round-robin.css";
@@ -13,9 +14,26 @@ type Matchup = {
     winner?: string;
 };
 
-const RoundRobin = () => {
-    const [matchups, setMatchups] = useState<Matchup[] | null>(null);
-    const { seeds, setInvalidIndexes } = useSeedStore();
+export type RoundRobinSnapshot = {
+    seeds: string[];
+    matchups: Matchup[];
+};
+
+type Props = {
+    initial?: RoundRobinSnapshot;
+};
+
+const RoundRobin = ({ initial }: Props) => {
+    const [matchups, setMatchups] = useState<Matchup[] | null>(
+        initial?.matchups ?? null
+    );
+    const { seeds, setInvalidIndexes, setSeeds } = useSeedStore();
+
+    useEffect(() => {
+        if (initial) {
+            setSeeds(initial.seeds);
+        }
+    }, [initial, setSeeds]);
     const generateMatchups = useCallback(() => {
         const filled = seeds.filter((s: string) => s.trim() !== "");
         const pairs: Matchup[] = [];
@@ -132,6 +150,22 @@ const RoundRobin = () => {
             )}
             {matchups && (
                 <>
+                    <div className="rr-share-row">
+                        <SaveShareBar
+                            canSave={matchups.length > 0}
+                            getPayload={() =>
+                                matchups && matchups.length > 0
+                                    ? {
+                                          format: "round_robin",
+                                          name: null,
+                                          teams: seeds,
+                                          state: { seeds, matchups },
+                                      }
+                                    : null
+                            }
+                        />
+                    </div>
+
                     <MatchupDeck matchups={matchups} onVote={handleVote} />
 
                     {allMatchupsVoted && (
