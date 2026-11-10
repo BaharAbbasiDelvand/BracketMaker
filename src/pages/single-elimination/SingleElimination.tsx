@@ -6,6 +6,7 @@ import {
     type SingleEliminationSnapshot,
 } from "../../features/single-elimination/hooks/useSingleEliminationTournament";
 import SaveShareBar from "../../components/share/SaveShareBar";
+import HomeLink from "../../components/nav/HomeLink";
 import "./single-elimination.css";
 
 type Props = {
@@ -36,6 +37,7 @@ export default function SingleEliminationPage({ initial }: Props) {
     return (
         <div className="se-page">
             <div className="se-inner">
+                <HomeLink />
                 <h1 className="se-title">
                     <span>Single Elimination</span>
                 </h1>

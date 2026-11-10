@@ -34,14 +34,16 @@ const SaveShareBar: React.FC<Props> = ({ canSave, getPayload }) => {
             window.history.replaceState(null, "", `/t/${id}`);
 
             const teams = Array.isArray(payload.teams)
-                ? (payload.teams as unknown[]).map((team) => String(team))
+                ? (payload.teams as unknown[])
+                      .map((team) => String(team))
+                      .filter((team) => team.trim() !== "")
                 : [];
 
             addMyBracket({
                 id,
                 format: payload.format,
                 teamsCount: teams.length,
-                preview: teams.filter((team) => team.trim() !== "").slice(0, 3),
+                preview: teams.slice(0, 3),
                 savedAt: Date.now(),
             });
 

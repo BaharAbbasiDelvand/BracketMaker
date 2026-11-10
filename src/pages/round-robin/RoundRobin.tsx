@@ -3,6 +3,7 @@ import SeedInputList from "../../components/input/SeedInput";
 import MatchupDeck from "../../components/cards/MatchupDeck";
 import Leaderboard from "../../components/leaderboard/Leaderboard";
 import SaveShareBar from "../../components/share/SaveShareBar";
+import HomeLink from "../../components/nav/HomeLink";
 import { useSeedStore } from "../../lib/seeds-zustand";
 import { Sprout } from "lucide-react";
 import "./round-robin.css";
@@ -113,6 +114,7 @@ const RoundRobin = ({ initial }: Props) => {
     return (
         <div className="round-robin-page">
         <div className="round-robin-container">
+            <HomeLink />
             <h2>
                 <span>Enter Seeds</span>
                 <Sprout size={30} strokeWidth={2.2} />

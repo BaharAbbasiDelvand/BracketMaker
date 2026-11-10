@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Trophy, Shuffle, Users, Pencil, ChevronDown } from "lucide-react";
 import SaveShareBar from "../../components/share/SaveShareBar";
+import HomeLink from "../../components/nav/HomeLink";
 import "./double-elimination.css";
 
 type Team = {
@@ -538,6 +539,7 @@ function DoubleElimination({ initial }: Props) {
     return (
         <div className="de-page">
             <div className="de-inner">
+                <HomeLink />
                 <h1 className="de-title-h">
                     <span>Double Elimination</span>
                 </h1>

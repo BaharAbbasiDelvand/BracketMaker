@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Repeat, Trophy, RotateCcw, ArrowRight, X } from "lucide-react";
+import { Repeat, Trophy, RotateCcw, ArrowRight, Trash2 } from "lucide-react";
 import {
     getMyBrackets,
     removeMyBracket,
@@ -67,14 +67,38 @@ function relativeTime(savedAt: number): string {
 
 export function Home() {
     const [saved, setSaved] = useState<MyBracketEntry[]>([]);
+    const [pendingDelete, setPendingDelete] = useState<MyBracketEntry | null>(
+        null
+    );
 
     useEffect(() => {
         setSaved(getMyBrackets());
     }, []);
 
-    const handleRemove = (id: string) => {
+    useEffect(() => {
+        if (!pendingDelete) {
+            return;
+        }
+
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setPendingDelete(null);
+            }
+        };
+
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [pendingDelete]);
+
+    const confirmRemove = () => {
+        if (!pendingDelete) {
+            return;
+        }
+
+        const id = pendingDelete.id;
         removeMyBracket(id);
         setSaved((current) => current.filter((item) => item.id !== id));
+        setPendingDelete(null);
     };
 
     return (
@@ -139,10 +163,11 @@ export function Home() {
                                     <button
                                         type="button"
                                         className="home__saved-remove"
-                                        onClick={() => handleRemove(entry.id)}
+                                        onClick={() => setPendingDelete(entry)}
                                         aria-label="Remove from this list"
+                                        title="Remove from this list"
                                     >
-                                        <X size={16} strokeWidth={2.4} />
+                                        <Trash2 size={16} strokeWidth={2.2} />
                                     </button>
                                 </li>
                             );
@@ -153,6 +178,53 @@ export function Home() {
                         it from this list.
                     </p>
                 </section>
+            )}
+
+            {pendingDelete && (
+                <div
+                    className="confirm-overlay"
+                    role="presentation"
+                    onClick={() => setPendingDelete(null)}
+                >
+                    <div
+                        className="confirm-card"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="confirm-title"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <span className="confirm-icon">
+                            <Trash2 size={22} strokeWidth={2.2} />
+                        </span>
+                        <h2 id="confirm-title" className="confirm-title">
+                            Remove this bracket?
+                        </h2>
+                        <p className="confirm-text">
+                            &ldquo;
+                            {FORMAT_LABELS[pendingDelete.format] ?? "Bracket"}
+                            &rdquo; will disappear from your saved list on this
+                            device. Anyone you&rsquo;ve shared the link with can
+                            still open it.
+                        </p>
+                        <div className="confirm-actions">
+                            <button
+                                type="button"
+                                className="confirm-cancel"
+                                onClick={() => setPendingDelete(null)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="confirm-delete"
+                                onClick={confirmRemove}
+                            >
+                                <Trash2 size={16} strokeWidth={2.3} />
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
