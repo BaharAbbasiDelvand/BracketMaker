@@ -48,6 +48,26 @@ export async function saveTournament(input: NewTournament): Promise<string> {
     return data.id as string;
 }
 
+export async function deleteTournament(id: string): Promise<boolean> {
+    if (!supabase) {
+        throw new Error(
+            "Supabase is not configured. Add REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_PUBLISHABLE_KEY to your .env."
+        );
+    }
+
+    const { data, error } = await supabase
+        .from(TABLE)
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return (data?.length ?? 0) > 0;
+}
+
 export async function loadTournament(
     id: string
 ): Promise<SavedTournament | null> {

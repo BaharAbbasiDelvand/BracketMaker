@@ -299,12 +299,49 @@
     color: #64748b;
 }
 
+.confirm-error {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+}
+
+.confirm-error svg {
+    flex-shrink: 0;
+}
+
 .confirm-actions {
     margin-top: 8px;
     width: 100%;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+.confirm-spin {
+    animation: confirm-spin-rot 0.9s linear infinite;
+}
+
+@keyframes confirm-spin-rot {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.confirm-cancel:disabled,
+.confirm-delete:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+    filter: none;
 }
 
 .confirm-cancel {

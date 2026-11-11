@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Repeat, Trophy, RotateCcw, ArrowRight, Trash2 } from "lucide-react";
+import {
+    Repeat,
+    Trophy,
+    RotateCcw,
+    ArrowRight,
+    Trash2,
+    Loader,
+    TriangleAlert,
+} from "lucide-react";
 import {
     getMyBrackets,
     removeMyBracket,
     FORMAT_LABELS,
     type MyBracketEntry,
 } from "../../lib/myBrackets";
-import { type TournamentFormat } from "../../lib/tournaments";
+import {
+    deleteTournament,
+    type TournamentFormat,
+} from "../../lib/tournaments";
 import "./Home.css";
 
 const modes = [
@@ -70,10 +81,21 @@ export function Home() {
     const [pendingDelete, setPendingDelete] = useState<MyBracketEntry | null>(
         null
     );
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
 
     useEffect(() => {
         setSaved(getMyBrackets());
     }, []);
+
+    const closeConfirm = () => {
+        if (deleting) {
+            return;
+        }
+
+        setPendingDelete(null);
+        setDeleteError("");
+    };
 
     useEffect(() => {
         if (!pendingDelete) {
@@ -81,24 +103,45 @@ export function Home() {
         }
 
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
+            if (e.key === "Escape" && !deleting) {
                 setPendingDelete(null);
+                setDeleteError("");
             }
         };
 
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [pendingDelete]);
+    }, [pendingDelete, deleting]);
 
-    const confirmRemove = () => {
-        if (!pendingDelete) {
+    const confirmRemove = async () => {
+        if (!pendingDelete || deleting) {
             return;
         }
 
         const id = pendingDelete.id;
-        removeMyBracket(id);
-        setSaved((current) => current.filter((item) => item.id !== id));
-        setPendingDelete(null);
+        setDeleting(true);
+        setDeleteError("");
+
+        try {
+            const deleted = await deleteTournament(id);
+
+            if (!deleted) {
+                setDeleteError(
+                    "Couldn't delete from the database — it may be missing a delete policy."
+                );
+                return;
+            }
+
+            removeMyBracket(id);
+            setSaved((current) => current.filter((item) => item.id !== id));
+            setPendingDelete(null);
+        } catch (error) {
+            setDeleteError(
+                error instanceof Error ? error.message : "Could not delete."
+            );
+        } finally {
+            setDeleting(false);
+        }
     };
 
     return (
@@ -164,8 +207,8 @@ export function Home() {
                                         type="button"
                                         className="home__saved-remove"
                                         onClick={() => setPendingDelete(entry)}
-                                        aria-label="Remove from this list"
-                                        title="Remove from this list"
+                                        aria-label="Delete this bracket"
+                                        title="Delete this bracket"
                                     >
                                         <Trash2 size={16} strokeWidth={2.2} />
                                     </button>
@@ -174,8 +217,8 @@ export function Home() {
                         })}
                     </ul>
                     <p className="home__saved-note">
-                        Saved on this device. Removing a bracket here only hides
-                        it from this list.
+                        Saved on this device. Deleting a bracket removes it from
+                        the database too, so its share link stops working.
                     </p>
                 </section>
             )}
@@ -184,7 +227,7 @@ export function Home() {
                 <div
                     className="confirm-overlay"
                     role="presentation"
-                    onClick={() => setPendingDelete(null)}
+                    onClick={closeConfirm}
                 >
                     <div
                         className="confirm-card"
@@ -197,20 +240,29 @@ export function Home() {
                             <Trash2 size={22} strokeWidth={2.2} />
                         </span>
                         <h2 id="confirm-title" className="confirm-title">
-                            Remove this bracket?
+                            Delete this bracket?
                         </h2>
                         <p className="confirm-text">
-                            &ldquo;
-                            {FORMAT_LABELS[pendingDelete.format] ?? "Bracket"}
-                            &rdquo; will disappear from your saved list on this
-                            device. Anyone you&rsquo;ve shared the link with can
-                            still open it.
+                            This permanently deletes your&nbsp;
+                            {FORMAT_LABELS[pendingDelete.format] ?? "bracket"}
+                            {" bracket"} and its share link. Anyone with the link
+                            will no longer be able to open it. This can&rsquo;t
+                            be undone.
                         </p>
+
+                        {deleteError && (
+                            <p className="confirm-error">
+                                <TriangleAlert size={15} strokeWidth={2.3} />
+                                {deleteError}
+                            </p>
+                        )}
+
                         <div className="confirm-actions">
                             <button
                                 type="button"
                                 className="confirm-cancel"
-                                onClick={() => setPendingDelete(null)}
+                                onClick={closeConfirm}
+                                disabled={deleting}
                             >
                                 Cancel
                             </button>
@@ -218,9 +270,18 @@ export function Home() {
                                 type="button"
                                 className="confirm-delete"
                                 onClick={confirmRemove}
+                                disabled={deleting}
                             >
-                                <Trash2 size={16} strokeWidth={2.3} />
-                                Remove
+                                {deleting ? (
+                                    <Loader
+                                        size={16}
+                                        strokeWidth={2.3}
+                                        className="confirm-spin"
+                                    />
+                                ) : (
+                                    <Trash2 size={16} strokeWidth={2.3} />
+                                )}
+                                {deleting ? "Deleting..." : "Delete"}
                             </button>
                         </div>
                     </div>
