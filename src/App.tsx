@@ -5,11 +5,13 @@ import DoubleElimination from "./pages/double-elimination/DoubleElimination";
 import { Home } from "./pages/home/Home";
 import SingleEliminationPage from "./pages/single-elimination/SingleElimination";
 import SharedTournament from "./pages/shared/SharedTournament";
+import AuthBar from "./components/auth/AuthBar";
 
 function App() {
     return (
         <Router>
             <div className="App">
+                <AuthBar />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/round-robin" element={<RoundRobin />} />

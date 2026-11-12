@@ -7,6 +7,7 @@ export interface SeedStore {
     setInvalidIndexes: (indexes: number[]) => void;
     addSeed: () => void;
     updateSeed: (index: number, value: string) => void;
+    removeSeed: (index: number) => void;
 }
 
 export const useSeedStore = create<SeedStore>((set, get) => ({
@@ -24,5 +25,15 @@ export const useSeedStore = create<SeedStore>((set, get) => ({
         const updated = [...get().seeds];
         updated[index] = value;
         set({ seeds: updated });
+    },
+    removeSeed: (index: number) => {
+        const seeds = get().seeds;
+        if (seeds.length <= 1) {
+            return;
+        }
+        set({
+            seeds: seeds.filter((_, i) => i !== index),
+            invalidIndexes: [],
+        });
     },
 }));

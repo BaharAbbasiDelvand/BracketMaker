@@ -115,40 +115,46 @@ const RoundRobin = ({ initial }: Props) => {
         <div className="round-robin-page">
         <div className="round-robin-container">
             <HomeLink />
-            <h2>
-                <span>Enter Seeds</span>
-                <Sprout size={30} strokeWidth={2.2} />
-            </h2>
             {!matchups && (
-                <>
-                    <SeedInputList />
-                    <button
-                        type="button"
-                        onClick={() => {
-                            if (hasAnyDuplicates) {
-                                const dups: number[] = [];
-                                seeds.forEach((s: string, i: number) => {
-                                    if (
-                                        s &&
-                                        seeds.findIndex(
-                                            (x: string) => x === s
-                                        ) !== i
-                                    ) {
-                                        dups.push(i);
-                                    }
-                                });
-                                setInvalidIndexes(dups);
-                                return;
-                            }
-                            setInvalidIndexes([]);
-                            generateMatchups();
-                        }}
-                        disabled={seeds.filter(Boolean).length < 2}
-                        className="btn btn-primary btn-lg rounded-pill shadow-sm rr-generate"
-                    >
-                        Generate Matchups
-                    </button>
-                </>
+                <div className="rr-entry">
+                    <h2 className="rr-heading">
+                        <span>Enter Seeds</span>
+                        <Sprout size={30} strokeWidth={2.2} />
+                    </h2>
+                    <p className="rr-entry__sub">
+                        Add everyone you want to rank — at least two — then
+                        generate every head-to-head matchup.
+                    </p>
+                    <div className="rr-card">
+                        <SeedInputList />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (hasAnyDuplicates) {
+                                    const dups: number[] = [];
+                                    seeds.forEach((s: string, i: number) => {
+                                        if (
+                                            s &&
+                                            seeds.findIndex(
+                                                (x: string) => x === s
+                                            ) !== i
+                                        ) {
+                                            dups.push(i);
+                                        }
+                                    });
+                                    setInvalidIndexes(dups);
+                                    return;
+                                }
+                                setInvalidIndexes([]);
+                                generateMatchups();
+                            }}
+                            disabled={seeds.filter(Boolean).length < 2}
+                            className="rr-generate"
+                        >
+                            Generate Matchups
+                        </button>
+                    </div>
+                </div>
             )}
             {matchups && (
                 <>

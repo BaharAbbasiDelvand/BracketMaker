@@ -1,19 +1,19 @@
 import React, { useRef, useState } from "react";
-import { TriangleAlert } from "lucide-react";
+import { TriangleAlert, Plus, X } from "lucide-react";
 import { useSeedStore } from "../../lib/seeds-zustand";
 import "./seedinput.css";
 
 const MAX_SEEDS = 30;
 
-// pastel generator for inputs
-const pastelColorGenerator = (i: number) => {
-    const hue = (i * 47) % 360;
-    return `hsl(${hue} 65% 92%)`;
-};
-
 const SeedInput: React.FC = () => {
-    const { seeds, invalidIndexes, updateSeed, addSeed, setInvalidIndexes } =
-        useSeedStore();
+    const {
+        seeds,
+        invalidIndexes,
+        updateSeed,
+        addSeed,
+        removeSeed,
+        setInvalidIndexes,
+    } = useSeedStore();
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
     const [emptyError, setEmptyError] = useState<string | null>(null);
 
@@ -32,6 +32,7 @@ const SeedInput: React.FC = () => {
         }
         setEmptyError(null);
         addSeed();
+        requestAnimationFrame(() => inputsRef.current[seeds.length]?.focus());
     };
 
     const handleKeyDown = (
@@ -62,34 +63,43 @@ const SeedInput: React.FC = () => {
     };
 
     return (
-        <div className="d-flex flex-column gap-3">
+        <div className="seed-list">
             {seeds.map((seed: string, index: number) => {
                 const hasError = invalidIndexes.includes(index);
                 const hasEmptyError =
                     emptyError !== null && seed.trim() === "";
+                const invalid = hasError || hasEmptyError;
+
                 return (
-                    <div key={index}>
-                        <input
-                            ref={(el) => setInputRef(el, index)}
-                            value={seed}
-                            onChange={(e) => {
-                                setEmptyError(null);
-                                updateSeed(index, e.currentTarget.value);
-                            }}
-                            placeholder={`Seed ${index + 1}`}
-                            className={`form-control form-control-lg ${
-                                hasError || hasEmptyError ? "is-invalid" : ""
-                            }`}
-                            style={{
-                                backgroundColor: pastelColorGenerator(index),
-                                borderRadius: "0.75rem",
-                            }}
-                            onKeyDown={(e) => handleKeyDown(e, index)}
-                        />
+                    <div className="seed-row-wrap" key={index}>
+                        <div className="seed-row">
+                            <span className="seed-row__num">{index + 1}</span>
+                            <input
+                                ref={(el) => setInputRef(el, index)}
+                                value={seed}
+                                onChange={(e) => {
+                                    setEmptyError(null);
+                                    updateSeed(index, e.currentTarget.value);
+                                }}
+                                placeholder={`Seed ${index + 1}`}
+                                className={`seed-input ${
+                                    invalid ? "seed-input--invalid" : ""
+                                }`}
+                                onKeyDown={(e) => handleKeyDown(e, index)}
+                            />
+                            <button
+                                type="button"
+                                className="seed-row__remove"
+                                onClick={() => removeSeed(index)}
+                                disabled={seeds.length <= 1}
+                                aria-label={`Remove seed ${index + 1}`}
+                                title="Remove seed"
+                            >
+                                <X size={16} strokeWidth={2.4} />
+                            </button>
+                        </div>
                         {hasError && (
-                            <div className="invalid-feedback d-block">
-                                Duplicate seed!
-                            </div>
+                            <p className="seed-row__error">Duplicate seed</p>
                         )}
                     </div>
                 );
@@ -97,7 +107,7 @@ const SeedInput: React.FC = () => {
 
             {emptyError && (
                 <div className="seed-empty-error" role="alert">
-                    <TriangleAlert size={18} strokeWidth={2.2} />
+                    <TriangleAlert size={16} strokeWidth={2.2} />
                     {emptyError}
                 </div>
             )}
@@ -106,9 +116,10 @@ const SeedInput: React.FC = () => {
                 type="button"
                 onClick={handleAddSeed}
                 disabled={seeds.length >= MAX_SEEDS}
-                className="btn btn-primary btn-lg rounded-pill shadow-sm align-self-start rr-add-seed"
+                className="rr-add-seed"
             >
-                + Add seed
+                <Plus size={17} strokeWidth={2.6} />
+                Add seed
             </button>
         </div>
     );

@@ -1,23 +1,137 @@
-.input-error-text {
-    color: red;
-    font-size: 0.8rem;
-    margin-top: 4px;
+.seed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.seed-row-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.seed-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.seed-row__num {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #be185d;
+    background: #fce7f3;
+}
+
+.seed-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #334155;
+    background: #f8fafc;
+    border: 1.5px solid rgba(148, 163, 184, 0.3);
+    border-radius: 11px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+.seed-input::placeholder {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.seed-input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #f9a8d4;
+    box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.35);
+}
+
+.seed-input--invalid {
+    border-color: #fda4af;
+    background: #fff1f2;
+    box-shadow: 0 0 0 3px rgba(253, 164, 175, 0.3);
+}
+
+.seed-row__remove {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    color: #cbd5e1;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.seed-row__remove:not(:disabled):hover {
+    color: #e11d48;
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+.seed-row__remove:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.seed-row__error {
+    margin: 0 0 0 38px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e11d48;
+}
+
+.rr-add-seed {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 11px 18px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0d9488;
+    background: #f0fdfa;
+    border: 1.5px dashed #5eead4;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.rr-add-seed:not(:disabled):hover {
+    background: #ccfbf1;
+    border-color: #2dd4bf;
+    color: #0f766e;
+}
+
+.rr-add-seed:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .seed-empty-error {
-    align-self: flex-start;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background: #fff1f2;
     color: #e11d48;
     border: 1.5px solid #fecdd3;
-    border-radius: 0.9rem;
-    padding: 10px 16px;
-    font-size: 0.92rem;
+    border-radius: 11px;
+    padding: 9px 14px;
+    font-size: 0.86rem;
     font-weight: 600;
-    box-shadow: 0 8px 18px -12px rgba(225, 29, 72, 0.5);
     animation: seed-empty-pop 0.22s ease;
 }
 
