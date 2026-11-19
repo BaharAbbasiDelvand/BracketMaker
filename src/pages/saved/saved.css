@@ -1,0 +1,125 @@
+.saved-page {
+    min-height: 100vh;
+    padding: 72px 20px 64px;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffe4f0 38%, #e0f2fe 100%);
+    color: #334155;
+}
+
+.saved-page__inner {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.saved-page__head {
+    margin: 26px 0 28px;
+    text-align: center;
+}
+
+.saved-page__badge {
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    color: #8b5cf6;
+    background: #f3f0ff;
+    border: 1px solid rgba(139, 92, 246, 0.28);
+    box-shadow: 0 16px 32px -20px rgba(139, 92, 246, 0.8);
+}
+
+.saved-page__title {
+    margin: 16px 0 0;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.saved-page__sub {
+    margin: 10px 0 0;
+    font-size: 0.98rem;
+    color: #64748b;
+}
+
+.saved-page__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 48px 0;
+    color: #8b5cf6;
+    font-weight: 600;
+}
+
+.saved-page__state p {
+    margin: 0;
+    color: #94a3b8;
+}
+
+.saved-page__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 44px 28px;
+    border-radius: 22px;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 20px 48px -30px rgba(100, 116, 139, 0.9);
+}
+
+.saved-page__empty-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    color: #a5b4fc;
+    background: #f5f3ff;
+    border: 1px dashed rgba(139, 92, 246, 0.4);
+}
+
+.saved-page__empty-title {
+    margin: 10px 0 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.saved-page__empty-text {
+    margin: 0;
+    max-width: 320px;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #64748b;
+}
+
+.saved-page__empty-cta {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 22px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-decoration: none;
+    background: linear-gradient(120deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 999px;
+    box-shadow: 0 16px 30px -18px rgba(99, 102, 241, 0.95);
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.saved-page__empty-cta:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.saved-page__empty-cta svg {
+    transition: transform 0.18s ease;
+}
+
+.saved-page__empty-cta:hover svg {
+    transform: translateX(4px);
+}

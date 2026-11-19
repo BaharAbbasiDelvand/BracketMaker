@@ -39,10 +39,10 @@
 
 .home__cards {
     display: grid;
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
     gap: 22px;
     width: 100%;
-    max-width: 880px;
+    max-width: 680px;
 }
 
 @media (max-width: 760px) {

@@ -5,6 +5,7 @@ import DoubleElimination from "./pages/double-elimination/DoubleElimination";
 import { Home } from "./pages/home/Home";
 import SingleEliminationPage from "./pages/single-elimination/SingleElimination";
 import SharedTournament from "./pages/shared/SharedTournament";
+import SavedTournaments from "./pages/saved/SavedTournaments";
 import AuthBar from "./components/auth/AuthBar";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                     <Route path="/round-robin" element={<RoundRobin />} />
                     <Route path="/single-elimination" element={<SingleEliminationPage />} />
                     <Route path="/double-elimination" element={<DoubleElimination />} />
+                    <Route path="/saved" element={<SavedTournaments />} />
                     <Route path="/t/:id" element={<SharedTournament />} />
                 </Routes>
             </div>

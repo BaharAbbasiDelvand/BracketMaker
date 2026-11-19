@@ -5,6 +5,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { auth0Domain, auth0ClientId, isAuth0Configured } from './lib/auth0';
+import AuthUserProvider from './components/auth/AuthUserProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(
@@ -21,7 +22,7 @@ root.render(
         clientId={auth0ClientId as string}
         authorizationParams={{ redirect_uri: window.location.origin }}
       >
-        {app}
+        <AuthUserProvider>{app}</AuthUserProvider>
       </Auth0Provider>
     ) : (
       app

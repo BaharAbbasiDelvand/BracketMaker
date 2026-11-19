@@ -3,6 +3,7 @@ import { Share2, Check, Copy, TriangleAlert, Loader } from "lucide-react";
 import { saveTournament, type NewTournament } from "../../lib/tournaments";
 import { isSupabaseConfigured } from "../../lib/supabaseClient";
 import { addMyBracket } from "../../lib/myBrackets";
+import { useCurrentUserSub } from "../auth/AuthUserProvider";
 import "./save-share-bar.css";
 
 type Status = "idle" | "saving" | "saved" | "error";
@@ -17,6 +18,7 @@ const SaveShareBar: React.FC<Props> = ({ canSave, getPayload }) => {
     const [shareUrl, setShareUrl] = useState("");
     const [copied, setCopied] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+    const userSub = useCurrentUserSub();
 
     const handleSave = async () => {
         const payload = getPayload();
@@ -29,7 +31,7 @@ const SaveShareBar: React.FC<Props> = ({ canSave, getPayload }) => {
         setErrorMsg("");
 
         try {
-            const id = await saveTournament(payload);
+            const id = await saveTournament({ ...payload, userId: userSub });
             const url = `${window.location.origin}/t/${id}`;
             window.history.replaceState(null, "", `/t/${id}`);
 
